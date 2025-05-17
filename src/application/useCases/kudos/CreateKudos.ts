@@ -38,6 +38,8 @@ export class CreateKudos {
         return ResponseMapper.validationError("Receiver not found");
       }
 
+      dto.teamId = receiver.teamId.toString();
+
       // Verify the category exists
       const category = await this.categoryRepository.getCategoryById(
         dto.categoryId

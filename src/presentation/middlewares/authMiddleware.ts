@@ -18,6 +18,7 @@ export class AuthMiddleware {
     // Bind methods to ensure 'this' context is preserved
     this.verifyToken = this.verifyToken.bind(this);
     this.requireTeamLead = this.requireTeamLead.bind(this);
+    this.requireAdminAndTeamLead = this.requireAdminAndTeamLead.bind(this);
   }
 
   /**
@@ -67,6 +68,32 @@ export class AuthMiddleware {
 
     if (req.user.role !== EUserRole.TEAM_LEAD) {
       res.status(403).json(ResponseMapper.error('Forbidden', 'This action requires team lead privileges'));
+      return;
+    }
+
+    next();
+  };
+
+  /**
+   * Express middleware to enforce admin role
+   */
+  requireAdminAndTeamLead = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      res.status(401).json(ResponseMapper.error('Unauthorized', 'User not authenticated'));
+      return;
+    }
+
+    const token = authHeader.split(' ')[1];
+    // Verify token with user repository
+    const user = await this.userRepository.verifyToken(token);
+    if (!user) {
+      res.status(401).json(ResponseMapper.error('Unauthorized', 'User not authenticated'));
+      return;
+    }
+
+    if (![EUserRole.ADMIN, EUserRole.TEAM_LEAD].includes(user.role)) {
+      res.status(403).json(ResponseMapper.error('Forbidden', 'This action requires administrator privileges'));
       return;
     }
 

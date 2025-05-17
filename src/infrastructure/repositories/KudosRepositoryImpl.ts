@@ -33,20 +33,26 @@ export class KudosRepositoryImpl implements IKudosRepository {
 
   async getPopulatedKudos(id: string): Promise<KudosDTO | null> {
     try {
-      const kudos = await KudosModel.findById(id);
+      const kudos = await KudosModel.findById(id)
+        .populate('senderId')
+        .populate('receiverId')
+        .populate('categoryId')
+        .populate('teamId')
+        .lean()
+        .exec();
+      
       if (!kudos) return null;
-
-      const sender = await UserModel.findById(kudos.senderId);
-      const receiver = await UserModel.findById(kudos.receiverId);
-      const category = await KudosCategoryModel.findById(kudos.categoryId);
-      const team = await TeamModel.findById(kudos.teamId);
-
-      if (!sender || !receiver || !category || !team) return null;
 
       const kudosDomain = KudosMapper.toDomain(kudos);
       if (!kudosDomain) return null;
 
-      return KudosMapper.toDTO(kudosDomain, sender, receiver, category, team);
+      return KudosMapper.toDTO(
+        kudosDomain, 
+        kudos.senderId as any, 
+        kudos.receiverId as any, 
+        kudos.categoryId as any,
+        kudos.teamId as any
+      );
     } catch (error) {
       console.error('Error getting populated kudos:', error);
       return null;
@@ -80,9 +86,7 @@ export class KudosRepositoryImpl implements IKudosRepository {
       let dbQuery = KudosModel.find(query)
         .sort({ createdAt: -1 });
       
-      if (offset) {
-        dbQuery = dbQuery.skip(offset);
-      }
+      dbQuery = dbQuery.skip(offset);
 
       if (limit) {
         dbQuery = dbQuery.limit(limit);
@@ -100,31 +104,31 @@ export class KudosRepositoryImpl implements IKudosRepository {
     try {
       const query = this.buildQueryFilters(filters);
       
-      let dbQuery = KudosModel.find(query)
-        .sort({ createdAt: -1 });
+      const kudos = await KudosModel.find(query)
+        .sort({ createdAt: -1 })
+        .populate('senderId')
+        .populate('receiverId')
+        .populate('categoryId')
+        .populate('teamId')
+        .skip(offset)
+        .limit(limit ? limit : 0)
+        .lean()
+        .exec();
       
-      if (offset) {
-        dbQuery = dbQuery.skip(offset);
-      }
-
-      if (limit) {
-        dbQuery = dbQuery.limit(limit);
-      }
-
-      const kudos = await dbQuery.exec();
       const result: KudosListItemDTO[] = [];
 
       for (const kudosDoc of kudos) {
-        const sender = await UserModel.findById(kudosDoc.senderId);
-        const receiver = await UserModel.findById(kudosDoc.receiverId);
-        const category = await KudosCategoryModel.findById(kudosDoc.categoryId);
-        const team = await TeamModel.findById(kudosDoc.teamId);
-
-        if (sender && receiver && category && team) {
-          const kudosDomain = KudosMapper.toDomain(kudosDoc);
-          if (kudosDomain) {
-            result.push(KudosMapper.toListItemDTO(kudosDomain, sender, receiver, category, team));
-          }
+        const kudosDomain = KudosMapper.toDomain(kudosDoc);
+        if (kudosDomain) {
+          result.push(
+            KudosMapper.toListItemDTO(
+              kudosDomain, 
+              kudosDoc.senderId as any, 
+              kudosDoc.receiverId as any, 
+              kudosDoc.categoryId as any,
+              kudosDoc.teamId as any
+            )
+          );
         }
       }
 

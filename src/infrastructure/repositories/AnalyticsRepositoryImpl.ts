@@ -4,6 +4,7 @@ import { KudosModel } from '../database/models/KudosModel';
 import { UserModel } from '../database/models/UserModel';
 import { TeamModel } from '../database/models/TeamModel';
 import mongoose from 'mongoose';
+import { AnalyticsMapper } from '../../mappers/AnalyticsMapper';
 
 export class AnalyticsRepositoryImpl implements IAnalyticsRepository {
   /**
@@ -23,14 +24,16 @@ export class AnalyticsRepositoryImpl implements IAnalyticsRepository {
       totalKudos,
       totalUsers,
       mostActiveDay,
-      prevTotalKudos
+      prevTotalKudos,
+      topTrendingCategories
     ] = await Promise.all([
       this.getTopReceivers(startDate, endDate, limit, request.teamId, request.categoryId),
       this.getTopTeams(startDate, endDate, limit, request.categoryId),
       this.getTotalKudosCount(startDate, endDate, request.teamId, request.categoryId),
       this.getTotalUsersCount(request.teamId),
       this.getMostActiveDay(startDate, endDate, request.teamId, request.categoryId),
-      this.getTotalKudosCount(prevStartDate, prevEndDate, request.teamId, request.categoryId)
+      this.getTotalKudosCount(prevStartDate, prevEndDate, request.teamId, request.categoryId),
+      this.topTrendingCategories(startDate, endDate)
     ]);
     
     // Calculate average kudos per person
@@ -48,9 +51,10 @@ export class AnalyticsRepositoryImpl implements IAnalyticsRepository {
       ? 100 // If previous was 0, consider it 100% increase
       : +((avgKudosPerPerson - prevAvgKudosPerPerson) / prevAvgKudosPerPerson * 100).toFixed(1);
     
-    // Construct and return the full analytics response
-    return {
+    // First transform raw data to domain entity
+    const analyticsDomain = AnalyticsMapper.toDomain({
       topRecognizedIndividuals,
+      topTrendingCategories,
       topTeams,
       totalKudos,
       avgKudosPerPerson,
@@ -67,7 +71,10 @@ export class AnalyticsRepositoryImpl implements IAnalyticsRepository {
       mostActiveDay,
       periodStart: startDate.toISOString(),
       periodEnd: endDate.toISOString()
-    };
+    });
+    
+    // Then transform domain entity to DTO
+    return AnalyticsMapper.toDTO(analyticsDomain);
   }
 
   /**
@@ -94,6 +101,52 @@ export class AnalyticsRepositoryImpl implements IAnalyticsRepository {
     } catch (error) {
       console.error('Error getting total kudos count:', error);
       return 0;
+    }
+  }
+
+  /** 
+   * Get top trending categories within a date range
+   * Returns the most frequently used kudos categories 
+   * sorted by popularity (count of kudos given)
+   * @param startDate - Start date for the analytics period
+   * @param endDate - End date for the analytics period
+   * @returns Array of trending categories with id, name and count
+   */
+  async topTrendingCategories(startDate: Date, endDate: Date): Promise<{id: string, name: string, count: number}[]> {
+    try {
+      const pipeline = [
+        { $match: { createdAt: { $gte: startDate, $lte: endDate } } },
+        {
+          $group: {
+            _id: '$categoryId',
+            count: { $sum: 1 }
+          }
+        },
+        { $sort: { count: -1 } }, 
+        { $limit: 5 },
+        {
+          $lookup: {
+            from: 'kudoscategories', // Collection name for KudosCategoryModel
+            localField: '_id',
+            foreignField: '_id',
+            as: 'categoryInfo'
+          }
+        },
+        { $unwind: '$categoryInfo' },
+        {
+          $project: {
+            id: { $toString: '$_id' },
+            name: '$categoryInfo.name',
+            count: 1,
+            _id: 0
+          }
+        }
+      ];
+
+      return await KudosModel.aggregate(pipeline as any);
+    } catch (error) {
+      console.error('Error getting top trending categories:', error);
+      return [];
     }
   }
 

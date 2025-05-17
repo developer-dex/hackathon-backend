@@ -12,8 +12,9 @@ export class GetAllKudos {
     filters?: KudosFilters
   ): Promise<ApiResponseDto<KudosListItemDTO[]>> {
     try {
+      const skip = (offset ? offset - 1 : 0) * (limit || 0);
       // Get all kudos with populated sender, receiver, and category
-      const kudosItems = await this.kudosRepository.getAllKudosPopulated(limit, offset, filters);
+      const kudosItems = await this.kudosRepository.getAllKudosPopulated(limit, skip, filters);
       
       // Count total for pagination
       const total = await this.kudosRepository.getTotalCount(filters);

@@ -200,4 +200,158 @@ curl -X POST \
 
 The response includes:
 - The original `icon` value (filename or icon name)
-- An `iconUrl` field with the full path to the icon image 
+- An `iconUrl` field with the full path to the icon image
+
+### Admin API
+
+The Admin API provides endpoints for administrative functions such as managing users.
+
+#### Get All Users
+
+Retrieve a list of all users with optional filtering by role.
+
+```bash
+curl -X GET \
+  'http://localhost:3000/api/admin/users?role=TEAM_MEMBER&limit=10&offset=0' \
+  -H 'Authorization: Bearer YOUR_JWT_TOKEN'
+```
+
+**Parameters:**
+- `role` (optional): Filter users by role (ADMIN, TEAM_LEAD, TEAM_MEMBER)
+- `limit` (optional): Number of users to return (pagination)
+- `offset` (optional): Starting position for pagination (default: 0)
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "users": [
+      {
+        "id": "65f123456789abcdef123456",
+        "name": "John Doe",
+        "email": "john@example.com",
+        "role": "TEAM_MEMBER",
+        "verificationStatus": "VERIFIED",
+        "createdAt": "2023-10-29T12:34:56.789Z"
+      },
+      {
+        "id": "65f123456789abcdef123457",
+        "name": "Jane Smith",
+        "email": "jane@example.com",
+        "role": "TEAM_LEAD",
+        "verificationStatus": "VERIFIED",
+        "createdAt": "2023-10-29T14:23:45.678Z"
+      }
+    ]
+  },
+  "message": "Users retrieved successfully",
+  "pagination": {
+    "total": 50,
+    "limit": 10,
+    "offset": 0
+  }
+}
+```
+
+**Access Control:**
+- This endpoint requires admin privileges
+- The user must be authenticated with a valid JWT token
+- The user's role must be ADMIN 
+
+#### Update User Verification Status
+
+Update a user's verification status.
+
+```bash
+curl -X PATCH \
+  'http://localhost:3000/api/admin/users/65f123456789abcdef123456/verification-status' \
+  -H 'Authorization: Bearer YOUR_JWT_TOKEN' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "status": "VERIFIED"
+  }'
+```
+
+**Parameters:**
+- `userId`: User ID (in the URL path)
+- `status`: New verification status (in the request body)
+
+Available status values:
+- `PENDING`: User is pending verification
+- `VERIFIED`: User is verified
+- `REJECTED`: User verification was rejected
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "user": {
+      "id": "65f123456789abcdef123456",
+      "name": "John Doe",
+      "email": "john@example.com",
+      "role": "TEAM_MEMBER",
+      "verificationStatus": "VERIFIED",
+      "createdAt": "2023-10-29T12:34:56.789Z"
+    }
+  },
+  "message": "User verification status updated successfully",
+  "statusCode": 200
+}
+```
+
+**Error Responses:**
+- 400 Bad Request: Invalid verification status
+- 404 Not Found: User not found
+- 401 Unauthorized: Missing or invalid token
+- 403 Forbidden: User doesn't have admin privileges 
+
+### Kudos API
+
+#### Create Kudos
+
+Creates a new kudos recognition.
+
+```bash
+curl -X POST \
+  'http://localhost:3000/api/kudos' \
+  -H 'Authorization: Bearer YOUR_JWT_TOKEN' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "receiverId": "65f123456789abcdef123456",
+    "categoryId": "65f123456789abcdef123458",
+    "message": "Great job on the project presentation!"
+  }'
+```
+
+**Note:** The teamId is automatically determined from the receiver's team assignment. The senderId is automatically set to the authenticated user's ID.
+
+**Parameters:**
+- `receiverId`: User ID of the kudos recipient (required)
+- `categoryId`: Category ID for the kudos (required)
+- `message`: Kudos message (required, 5-500 characters)
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "65f123456789abcdef123460",
+    "senderId": "65f123456789abcdef123457",
+    "receiverId": "65f123456789abcdef123456",
+    "categoryId": "65f123456789abcdef123458",
+    "teamId": "65f123456789abcdef123459",
+    "message": "Great job on the project presentation!",
+    "createdAt": "2023-10-30T15:45:23.456Z",
+    "updatedAt": "2023-10-30T15:45:23.456Z"
+  },
+  "message": "Kudos created successfully",
+  "statusCode": 201
+}
+```
+
+**Access Control:**
+- This endpoint requires team lead privileges
+- The authenticated user must have the TEAM_LEAD role
+- The sender must be the authenticated user
