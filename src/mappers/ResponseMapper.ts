@@ -17,6 +17,7 @@ export class ResponseMapper {
       success: true,
       data,
       message,
+      statusCode: 200,
       ...(pagination && { pagination })
     };
   }
@@ -24,11 +25,12 @@ export class ResponseMapper {
   /**
    * Create a failure response with error message
    */
-  public static error<T>(message: string, error?: string): ApiResponseDto<T> {
+  public static error<T>(message: string, error?: string, statusCode: number = 400): ApiResponseDto<T> {
     return {
       success: false,
       message,
-      error
+      error,
+      statusCode
     };
   }
 
@@ -36,28 +38,28 @@ export class ResponseMapper {
    * Create a response for unauthorized access
    */
   public static unauthorized<T>(error = 'Authentication failed'): ApiResponseDto<T> {
-    return this.error('Unauthorized', error);
+    return this.error('Unauthorized', error, 401);
   }
 
   /**
    * Create a response for forbidden access
    */
   public static forbidden<T>(error = 'Access denied'): ApiResponseDto<T> {
-    return this.error('Forbidden', error);
+    return this.error('Forbidden', error, 403);
   }
 
   /**
    * Create a response for not found resources
    */
-  public static notFound<T>(resource = 'Resource', error?: string): ApiResponseDto<T> {
-    return this.error(`${resource} not found`, error);
+  public static notFound<T>(error = 'Resource not found'): ApiResponseDto<T> {
+    return this.error('Not found', error, 404);
   }
 
   /**
    * Create a response for validation errors
    */
   public static validationError<T>(error: string): ApiResponseDto<T> {
-    return this.error('Validation failed', error);
+    return this.error('Validation failed', error, 400);
   }
 
   /**
@@ -65,6 +67,6 @@ export class ResponseMapper {
    */
   public static serverError<T>(error?: Error): ApiResponseDto<T> {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-    return this.error('Internal server error', errorMessage);
+    return this.error('Internal server error', errorMessage, 500);
   }
 } 

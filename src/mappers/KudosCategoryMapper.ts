@@ -1,3 +1,4 @@
+import { config } from '../config/config';
 import { KudosCategory } from '../domain/entities/KudosCategory';
 import { KudosCategoryDTO } from '../dtos/KudosCategoryDto';
 import { KudosCategoryDocument } from '../infrastructure/database/models/KudosCategoryModel';

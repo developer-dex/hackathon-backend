@@ -12,7 +12,7 @@ export class AnalyticsController {
       // Check if user is authenticated
       if (!req.user) {
         const response = ResponseMapper.unauthorized('Authentication required');
-        res.status(401).json(response);
+        res.status(response.statusCode).json(response);
         return;
       }
       
@@ -40,11 +40,11 @@ export class AnalyticsController {
       if (result.success) {
         res.status(200).json(result);
       } else {
-        res.status(500).json(result);
+        res.status(result.statusCode).json(result);
       }
     } catch (error) {
       const response = ResponseMapper.serverError(error instanceof Error ? error : undefined);
-      res.status(500).json(response);
+      res.status(response.statusCode).json(response);
     }
   }
   

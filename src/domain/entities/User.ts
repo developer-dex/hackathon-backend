@@ -1,12 +1,13 @@
 export enum EUserRole {
-  TEAM_MEMBER = 'TEAM_MEMBER',
-  TEAM_LEAD = 'TEAM_LEAD'
+  TEAM_MEMBER = 'Team Member',
+  TEAM_LEAD = 'Team Lead',
+  ADMIN = 'Admin'
 }
 
 export enum VerificationStatus {
-  PENDING = 'PENDING',
-  VERIFIED = 'VERIFIED',
-  REJECTED = 'REJECTED'
+  PENDING = 'Pending',
+  VERIFIED = 'Verified',
+  REJECTED = 'Rejected'
 }
 
 export interface UserDTO {

@@ -1,5 +1,5 @@
-import { User as DomainUser, EUserRole, User, VerificationStatus } from '../domain/entities/User';
-import { UserDTO } from '../dtos/AuthDto';
+import { User as DomainUser, EUserRole, User, VerificationStatus, UserDTO as DomainUserDTO } from '../domain/entities/User';
+import { UserDTO as AuthUserDTO } from '../dtos/AuthDto';
 import { UserDocument } from '../infrastructure/database/models/UserModel';
 
 /**
@@ -11,7 +11,7 @@ export class UserMapper {
    * Map from User entity to UserDTO (for API responses)
    * Removes sensitive information like password
    */
-  public static toDTO(user: User): Omit<UserDTO, 'teamId'> {
+  public static toDTO(user: User): Omit<AuthUserDTO, 'teamId'> {
     return {
       id: user.getId(),
       name: user.getName(),
@@ -47,7 +47,7 @@ export class UserMapper {
   /**
    * Map from MongoDB document directly to UserDTO (combines toDomain and toDTO)
    */
-  public static documentToDTO(userDocument: UserDocument | null): UserDTO | null {
+  public static documentToDTO(userDocument: UserDocument | null): AuthUserDTO | null {
     const user = this.toDomain(userDocument);
     return user ? this.toDTO(user) : null;
   }
@@ -55,12 +55,34 @@ export class UserMapper {
   /**
    * Create a token payload from a UserDTO
    */
-  public static toTokenPayload(user: UserDTO): Record<string, any> {
+  public static toTokenPayload(user: AuthUserDTO): Record<string, any> {
     return {
       sub: user.id,
       email: user.email,
       name: user.name,
       role: user.role
     };
+  }
+
+  /**
+   * Convert from Auth UserDTO to Domain UserDTO
+   * Ensures compatibility between the two interfaces
+   */
+  public static authToDomainDTO(authDTO: AuthUserDTO | null): DomainUserDTO | null {
+    if (!authDTO) return null;
+    
+    return {
+      ...authDTO,
+      teamId: authDTO.teamId || '' // Ensure teamId is a string for domain DTO
+    };
+  }
+
+  /**
+   * Convert from Domain UserDTO to Auth UserDTO
+   */
+  public static domainToAuthDTO(domainDTO: DomainUserDTO | null): AuthUserDTO | null {
+    if (!domainDTO) return null;
+    
+    return domainDTO;
   }
 } 

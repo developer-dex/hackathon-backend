@@ -24,7 +24,7 @@ export class KudosCategoryController {
       if (error) {
         const errorMessage = error.details.map((detail: any) => detail.message).join(', ');
         const response = ResponseMapper.validationError(errorMessage);
-        res.status(400).json(response);
+        res.status(response.statusCode).json(response);
         return;
       }
       
@@ -42,7 +42,7 @@ export class KudosCategoryController {
       }
     } catch (error) {
       const response = ResponseMapper.serverError(error instanceof Error ? error : undefined);
-      res.status(500).json(response);
+      res.status(response.statusCode).json(response);
     }
   }
 
@@ -56,11 +56,11 @@ export class KudosCategoryController {
       if (result.success) {
         res.status(200).json(result);
       } else {
-        res.status(500).json(result);
+        res.status(result.statusCode).json(result);
       }
     } catch (error) {
       const response = ResponseMapper.serverError(error instanceof Error ? error : undefined);
-      res.status(500).json(response);
+      res.status(response.statusCode).json(response);
     }
   }
 } 
