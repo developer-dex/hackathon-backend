@@ -45,14 +45,14 @@ export class KudosMapper {
     const team = TeamMapper.documentToDTO(teamDoc)!;
     
     return {
-      id: kudos.id,
+      id: kudos.getId(),
       sender,
       receiver,
       category,
       team,
-      message: kudos.message,
-      createdAt: kudos.createdAt,
-      updatedAt: kudos.updatedAt
+      message: kudos.getMessage(),
+      createdAt: kudos.getCreatedAt(),
+      updatedAt: kudos.getUpdatedAt()
     };
   }
 

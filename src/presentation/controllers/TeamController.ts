@@ -34,7 +34,7 @@ export class TeamController {
       if (result.success) {
         res.status(201).json(result);
       } else {
-        res.status(400).json(result);
+        res.status(result.statusCode).json(result);
       }
     } catch (error) {
       res.status(500).json(ResponseMapper.serverError(error instanceof Error ? error : undefined));
@@ -49,7 +49,7 @@ export class TeamController {
       if (result.success) {
         res.status(200).json(result);
       } else {
-        res.status(500).json(result);
+        res.status(result.statusCode).json(result);
       }
     } catch (error) {
       res.status(500).json(ResponseMapper.serverError(error instanceof Error ? error : undefined));
@@ -68,7 +68,7 @@ export class TeamController {
       } else if (result.message === 'Team not found') {
         res.status(404).json(result);
       } else {
-        res.status(500).json(result);
+        res.status(result.statusCode).json(result);
       }
     } catch (error) {
       res.status(500).json(ResponseMapper.serverError(error instanceof Error ? error : undefined));
@@ -98,7 +98,7 @@ export class TeamController {
       } else if (result.message === 'Team not found') {
         res.status(404).json(result);
       } else {
-        res.status(400).json(result);
+        res.status(result.statusCode).json(result);
       }
     } catch (error) {
       res.status(500).json(ResponseMapper.serverError(error instanceof Error ? error : undefined));
@@ -117,7 +117,7 @@ export class TeamController {
       } else if (result.message === 'Team not found') {
         res.status(404).json(result);
       } else {
-        res.status(400).json(result);
+        res.status(result.statusCode).json(result);
       }
     } catch (error) {
       res.status(500).json(ResponseMapper.serverError(error instanceof Error ? error : undefined));

@@ -20,7 +20,7 @@ export class AuthController {
       if (error) {
         const errorMessage = error.details.map(detail => detail.message).join(', ');
         const response = ResponseMapper.validationError(errorMessage);
-        res.status(400).json(response);
+        res.status(response.statusCode).json(response);
         return;
       }
       
@@ -35,11 +35,11 @@ export class AuthController {
       if (result.success) {
         res.status(200).json(result);
       } else {
-        res.status(401).json(result);
+        res.status(result.statusCode || 401).json(result);
       }
     } catch (error) {
       const response = ResponseMapper.serverError(error instanceof Error ? error : undefined);
-      res.status(500).json(response);
+      res.status(response.statusCode).json(response);
     }
   }
 
@@ -51,7 +51,7 @@ export class AuthController {
       if (error) {
         const errorMessage = error.details.map(detail => detail.message).join(', ');
         const response = ResponseMapper.validationError(errorMessage);
-        res.status(400).json(response);
+        res.status(response.statusCode).json(response);
         return;
       }
       
@@ -63,13 +63,13 @@ export class AuthController {
       if (result.success) {
         res.status(201).json(result);
       } else {
-        // Determine appropriate status code based on error
-        const statusCode = result.error?.includes('already registered') ? 409 : 400;
+        // Determine appropriate status code based on error or use the one from the response
+        const statusCode = result.statusCode || (result.error?.includes('already registered') ? 409 : 400);
         res.status(statusCode).json(result);
       }
     } catch (error) {
       const response = ResponseMapper.serverError(error instanceof Error ? error : undefined);
-      res.status(500).json(response);
+      res.status(response.statusCode).json(response);
     }
   }
 } 

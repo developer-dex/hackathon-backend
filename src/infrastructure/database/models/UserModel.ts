@@ -65,6 +65,7 @@ userSchema.pre('save', async function (next) {
   
   // Only hash the password if it has been modified (or is new)
   if (!user.isModified('password')) {
+    console.log('Password not modified');
     return next();
   }
   
@@ -72,6 +73,7 @@ userSchema.pre('save', async function (next) {
     // Generate salt and hash the password
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(user.password, salt);
+    console.log('Password hashed');
     next();
   } catch (error) {
     next(error as Error);

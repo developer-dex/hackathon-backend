@@ -14,10 +14,13 @@ export class Login {
       
       // Find user by email
       const user = await this.userRepository.findByEmail(email);
+
+      console.log(user);
       
       // If user not found
       if (!user) {
-        return ResponseMapper.unauthorized('Invalid email or password');
+        console.log('User not found');
+        return ResponseMapper.notFound('Invalid email or password');
       }
       
       // Check if user is verified

@@ -1,6 +1,7 @@
 import { User, UserDTO } from '../../domain/entities/User';
 import { UserRepositoryImpl } from './UserRepositoryImpl';
 import { AuthRepository } from '../../domain/interfaces/repositories/AuthRepository';
+import { UserMapper } from '../../mappers/UserMapper';
 
 export class AuthRepositoryImpl implements AuthRepository {
   private userRepository: UserRepositoryImpl;
@@ -21,7 +22,8 @@ export class AuthRepositoryImpl implements AuthRepository {
     return this.userRepository.generateToken(user);
   }
 
-  verifyToken(token: string): Promise<UserDTO | null> {
-    return this.userRepository.verifyToken(token);
+  async verifyToken(token: string): Promise<UserDTO | null> {
+    const authUser = await this.userRepository.verifyToken(token);
+    return UserMapper.authToDomainDTO(authUser);
   }
 }
