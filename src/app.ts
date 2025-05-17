@@ -1,23 +1,60 @@
-import dotenv from 'dotenv';
-import createApp from './config/app';
-import connectDatabase from './infrastructure/database/connection';
-
-// Load environment variables
-dotenv.config();
+import express from 'express';
+import mongoose from 'mongoose';
+import cors from 'cors';
+import helmet from 'helmet';
+import { config } from './config';
+import { authRouter } from './interfaces/routes/authRoutes';
 
 // Create Express app
-const app = createApp();
+const app = express();
+
+// Middleware
+app.use(helmet());
+app.use(cors());
+app.use(express.json());
 
 // Connect to MongoDB
-connectDatabase()
+mongoose
+  .connect(config.databaseURL)
   .then(() => {
-    // Start server
-    const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
+    console.log('Connected to MongoDB');
   })
   .catch((error) => {
-    console.error('Failed to start server:', error);
+    console.error('MongoDB connection error:', error);
     process.exit(1);
-  }); 
+  });
+
+// API routes
+app.use('/api/auth', authRouter);
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'OK', message: 'Server is running' });
+});
+
+// Handle undefined routes
+app.use('*', (req, res) => {
+  res.status(404).json({
+    success: false,
+    message: 'Endpoint not found',
+    error: `Cannot ${req.method} ${req.originalUrl}`
+  });
+});
+
+// Error handling middleware
+app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({
+    success: false,
+    message: 'Internal server error',
+    error: process.env.NODE_ENV === 'production' ? 'Something went wrong' : err.message
+  });
+});
+
+// Start server
+const PORT = config.port;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
+export default app; 

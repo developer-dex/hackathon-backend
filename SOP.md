@@ -1,6 +1,6 @@
-# Standard Operating Procedure (SOP) for Todo Application
+# Standard Operating Procedure (SOP) for Kudos Application
 
-This document outlines the standard procedures for setting up, developing, testing, and maintaining the Todo application.
+This document outlines the standard procedures for setting up, developing, testing, and maintaining the Kudos application.
 
 ## Table of Contents
 
@@ -85,6 +85,37 @@ npm test -- --coverage
 
 ## Code Standards
 
+### TypeScript Naming Conventions
+
+### The project follows these naming conventions:
+
+```typescript
+// i - Instance
+const iAuthRouteUseCase = new AuthRouteUseCase();
+
+// T - Type
+type TUserPayload = {
+  name: string;
+  age: number;
+};
+
+// I - Interface
+interface IUser {
+  id: number;
+  email: string;
+}
+
+// C - Constant
+const CMAXLIMIT = 100;
+
+// E - Enum
+enum EUserRole {
+  Admin = 'ADMIN',
+  User = 'USER',
+  Guest = 'GUEST',
+}
+```
+
 ### TypeScript Configuration
 
 - The project uses TypeScript with configuration in `tsconfig.json`
@@ -121,32 +152,6 @@ The application follows Clean Architecture principles:
   - `frameworks/`: External frameworks and tools
   - `middlewares/`: Express middlewares
   - `config/`: Application configuration
-
-## API Documentation
-
-### Todo Endpoints
-
-- **GET /api/todos**: Get all todos
-  - Returns: Array of todo items
-  - Status codes: 200, 500
-
-- **GET /api/todos/:id**: Get a specific todo
-  - Returns: Todo item
-  - Status codes: 200, 404, 500
-
-- **POST /api/todos**: Create a new todo
-  - Body: Todo data (title, description, completed)
-  - Returns: Created todo
-  - Status codes: 201, 400, 500
-
-- **PUT /api/todos/:id**: Update a todo
-  - Body: Todo data to update
-  - Returns: Updated todo
-  - Status codes: 200, 404, 400, 500
-
-- **DELETE /api/todos/:id**: Delete a todo
-  - Returns: Success message
-  - Status codes: 200, 404, 500
 
 ### Error Handling
 

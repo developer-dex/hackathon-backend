@@ -1,4 +1,4 @@
-import { TodoRepository } from '../../domain/interfaces/TodoRepository';
+import { TodoRepository } from '../../domain/repositories/TodoRepository';
 import { TodoResponseDto } from '../../dtos/TodoDto';
 import { TodoMapper } from '../../mappers/TodoMapper';
 
