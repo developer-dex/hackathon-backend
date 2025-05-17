@@ -5,6 +5,7 @@ import { CreateKudosDTO } from '../../dtos/KudosDto';
 import { validateKudosRequest } from '../validation/kudosValidation';
 import { ResponseMapper } from '../../mappers/ResponseMapper';
 import { AuthenticatedRequest } from '../middlewares/authMiddleware';
+import { KudosFilters } from '../../domain/interfaces/repositories/KudosRepository';
 
 export class KudosController {
   constructor(
@@ -64,8 +65,27 @@ export class KudosController {
       const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
       const offset = req.query.offset ? parseInt(req.query.offset as string) : 0;
       
-      // Execute use case
-      const result = await this.getAllKudosUseCase.execute(limit, offset);
+      // Build filters from query parameters
+      const filters: KudosFilters = {};
+      
+      if (req.query.teamId) {
+        filters.teamId = req.query.teamId as string;
+      }
+      
+      if (req.query.categoryId) {
+        filters.categoryId = req.query.categoryId as string;
+      }
+      
+      if (req.query.senderId) {
+        filters.senderId = req.query.senderId as string;
+      }
+      
+      if (req.query.receiverId) {
+        filters.receiverId = req.query.receiverId as string;
+      }
+      
+      // Execute use case with filters
+      const result = await this.getAllKudosUseCase.execute(limit, offset, Object.keys(filters).length > 0 ? filters : undefined);
       
       if (result.success) {
         res.status(200).json(result);

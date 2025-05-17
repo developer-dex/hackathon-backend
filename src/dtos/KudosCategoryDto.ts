@@ -3,6 +3,7 @@ export interface KudosCategoryDTO {
   name: string;
   description: string;
   icon: string;
+  iconUrl: string;
   color: string;
   isActive: boolean;
   createdAt: string;

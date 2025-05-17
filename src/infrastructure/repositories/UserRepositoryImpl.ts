@@ -92,7 +92,7 @@ export class UserRepositoryImpl implements IUserRepository {
         email: userData.email,
         password: userData.password,
         role: userData.role,
-        department: userData.department,
+        teamId: userData.teamId,
         verificationStatus: VerificationStatus.PENDING
       });
 

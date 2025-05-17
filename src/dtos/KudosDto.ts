@@ -1,13 +1,14 @@
 import { UserDTO } from './AuthDto';
 import { KudosCategoryDTO } from './KudosCategoryDto';
+import { TeamDTO } from './TeamDto';
 
 export interface KudosDTO {
   id: string;
   sender: UserDTO;
   receiver: UserDTO;
   category: KudosCategoryDTO;
+  team: TeamDTO;
   message: string;
-  teamName: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -16,8 +17,8 @@ export interface CreateKudosDTO {
   senderId: string;
   receiverId: string;
   categoryId: string;
+  teamId: string;
   message: string;
-  teamName: string;
 }
 
 export interface KudosListItemDTO {
@@ -25,12 +26,12 @@ export interface KudosListItemDTO {
   sender: {
     id: string;
     name: string;
-    department: string;
+    teamId: string;
   };
   receiver: {
     id: string;
     name: string;
-    department: string;
+    teamId: string;
   };
   category: {
     id: string;
@@ -38,7 +39,10 @@ export interface KudosListItemDTO {
     icon: string;
     color: string;
   };
+  team: {
+    id: string;
+    name: string;
+  };
   message: string;
-  teamName: string;
   createdAt: string;
 } 

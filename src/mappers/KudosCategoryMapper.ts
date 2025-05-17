@@ -1,6 +1,7 @@
 import { KudosCategory } from '../domain/entities/KudosCategory';
 import { KudosCategoryDTO } from '../dtos/KudosCategoryDto';
 import { KudosCategoryDocument } from '../infrastructure/database/models/KudosCategoryModel';
+import { getIconUrl } from '../infrastructure/services/FileUploadService';
 
 /**
  * KudosCategoryMapper - Responsible for transforming KudosCategory objects between different layers
@@ -11,14 +12,15 @@ export class KudosCategoryMapper {
    */
   public static toDTO(category: KudosCategory): KudosCategoryDTO {
     return {
-      id: category.id,
-      name: category.name,
-      description: category.description,
-      icon: category.icon,
-      color: category.color,
-      isActive: category.isActive,
-      createdAt: category.createdAt,
-      updatedAt: category.updatedAt
+      id: category.getId(),
+      name: category.getName(),
+      description: category.getDescription(),
+      icon: category.getIcon(),
+      iconUrl: this.getFullIconUrl(category.getIcon()),
+      color: category.getColor(),
+      isActive: category.getIsActive(),
+      createdAt: category.getCreatedAt(),
+      updatedAt: category.getUpdatedAt()
     };
   }
 
@@ -47,5 +49,18 @@ export class KudosCategoryMapper {
    */
   public static toDomainList(categoryDocuments: KudosCategoryDocument[]): KudosCategory[] {
     return categoryDocuments.map(doc => this.toDomain(doc)!).filter(Boolean);
+  }
+
+  /**
+   * Get full URL for an icon file
+   */
+  private static getFullIconUrl(iconPath: string): string {
+    // For default icons (those without a file extension), return as is
+    if (!iconPath.includes('.')) {
+      return iconPath;
+    }
+    
+    // For uploaded files, generate proper URL
+    return getIconUrl(iconPath);
   }
 } 

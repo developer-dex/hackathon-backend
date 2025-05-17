@@ -31,4 +31,38 @@ export class KudosCategory {
       props.updatedAt
     );
   }
+
+  getId(): string {
+    return this.id;
+  }
+
+  getName(): string {
+    return this.name;
+  }
+
+  getDescription(): string {
+    return this.description;
+  }
+
+  getIcon(): string {
+    return this.icon;
+  }
+
+  getColor(): string {
+    return this.color;
+  }
+
+  getIsActive(): boolean {
+    return this.isActive;
+  }
+
+  getCreatedAt(): string {
+    return this.createdAt;
+  }
+
+  getUpdatedAt(): string {
+    return this.updatedAt;
+  }
+  
+  
 } 

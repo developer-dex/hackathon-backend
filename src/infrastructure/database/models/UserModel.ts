@@ -7,7 +7,7 @@ export interface UserDocument extends Document {
   email: string;
   password: string;
   role: EUserRole;
-  department: string;
+  teamId: mongoose.Types.ObjectId;
   verificationStatus: VerificationStatus;
   createdAt: Date;
   updatedAt: Date;
@@ -43,10 +43,10 @@ const userSchema = new Schema(
       enum: Object.values(EUserRole),
       default: EUserRole.TEAM_MEMBER
     },
-    department: {
-      type: String,
-      required: true,
-      trim: true
+    teamId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Team',
+      required: true
     },
     verificationStatus: {
       type: String,

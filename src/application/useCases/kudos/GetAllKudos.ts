@@ -1,18 +1,22 @@
 import { ApiResponseDto } from '../../../dtos/ApiResponseDto';
 import { KudosListItemDTO } from '../../../dtos/KudosDto';
-import { IKudosRepository } from '../../../domain/interfaces/repositories/KudosRepository';
+import { IKudosRepository, KudosFilters } from '../../../domain/interfaces/repositories/KudosRepository';
 import { ResponseMapper } from '../../../mappers/ResponseMapper';
 
 export class GetAllKudos {
   constructor(private kudosRepository: IKudosRepository) {}
 
-  async execute(limit?: number, offset?: number): Promise<ApiResponseDto<KudosListItemDTO[]>> {
+  async execute(
+    limit?: number, 
+    offset?: number, 
+    filters?: KudosFilters
+  ): Promise<ApiResponseDto<KudosListItemDTO[]>> {
     try {
       // Get all kudos with populated sender, receiver, and category
-      const kudosItems = await this.kudosRepository.getAllKudosPopulated(limit, offset);
+      const kudosItems = await this.kudosRepository.getAllKudosPopulated(limit, offset, filters);
       
       // Count total for pagination
-      const total = await this.kudosRepository.getTotalCount();
+      const total = await this.kudosRepository.getTotalCount(filters);
       
       return ResponseMapper.success(
         kudosItems,

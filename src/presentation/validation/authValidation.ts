@@ -77,12 +77,13 @@ export const validateSignupRequest = (data: SignupRequestDto) => {
         'any.required': 'Role is required'
       }),
       
-    department: Joi.string()
+    teamId: Joi.string()
       .required()
-      .trim()
+      .pattern(/^[0-9a-fA-F]{24}$/)
       .messages({
-        'string.empty': 'Department is required',
-        'any.required': 'Department is required'
+        'string.empty': 'Team ID is required',
+        'string.pattern.base': 'Team ID must be a valid MongoDB ObjectId',
+        'any.required': 'Team ID is required'
       })
   });
 

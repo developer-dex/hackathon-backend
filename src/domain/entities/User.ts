@@ -14,7 +14,7 @@ export interface UserDTO {
   name: string;
   email: string;
   role: EUserRole;
-  department: string;
+  teamId: string;
   verificationStatus: VerificationStatus;
   createdAt: string;
   updatedAt: string;
@@ -28,7 +28,7 @@ export class User {
     public readonly email: string,
     public readonly password: string,
     public readonly role: EUserRole,
-    public readonly department: string,
+    public readonly teamId: string,
     public readonly verificationStatus: VerificationStatus,
     public readonly createdAt: string,
     public readonly updatedAt: string
@@ -40,7 +40,7 @@ export class User {
     email: string;
     password: string;
     role: EUserRole;
-    department: string;
+    teamId: string;
     verificationStatus: VerificationStatus;
     createdAt: string;
     updatedAt: string;
@@ -51,7 +51,7 @@ export class User {
       props.email,
       props.password,
       props.role,
-      props.department,
+      props.teamId,
       props.verificationStatus,
       props.createdAt,
       props.updatedAt
@@ -74,8 +74,8 @@ export class User {
     return this.role;
   }
   
-  getDepartment(): string {
-    return this.department;
+  getTeamId(): string {
+    return this.teamId;
   }
 
   getVerificationStatus(): VerificationStatus {

@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import path from 'path';
 import router from './presentation/routes/index';
 import { config } from './config/config';
 
@@ -14,6 +15,9 @@ app.use(helmet());
 app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
+
+// Serve static files
+app.use(express.static(path.join(process.cwd(), 'public')));
 
 // Connect to MongoDB
 mongoose

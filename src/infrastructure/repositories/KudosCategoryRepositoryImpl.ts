@@ -45,9 +45,9 @@ export class KudosCategoryRepositoryImpl implements IKudosCategoryRepository {
     }
   }
 
-  async getAllCategories(activeOnly: boolean = false): Promise<KudosCategory[]> {
+  async getAllCategories(): Promise<KudosCategory[]> {
     try {
-      const query = activeOnly ? { isActive: true } : {};
+      const query = { isActive: true };
       const categories = await KudosCategoryModel.find(query).sort({ name: 1 });
       return KudosCategoryMapper.toDomainList(categories);
     } catch (error) {
