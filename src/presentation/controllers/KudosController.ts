@@ -29,6 +29,7 @@ export class KudosController {
       const kudosData = {
         ...req.body,
         senderId: currentUser.id
+        // teamId will be derived from receiverId in the use case
       };
       
       // Validate request data

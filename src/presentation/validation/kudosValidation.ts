@@ -30,15 +30,6 @@ export const validateKudosRequest = (data: CreateKudosDTO) => {
         'any.required': 'Category ID is required'
       }),
       
-    teamId: Joi.string()
-      .required()
-      .pattern(/^[0-9a-fA-F]{24}$/)
-      .messages({
-        'string.empty': 'Team ID is required',
-        'string.pattern.base': 'Team ID must be a valid MongoDB ObjectId',
-        'any.required': 'Team ID is required'
-      }),
-      
     message: Joi.string()
       .required()
       .trim()

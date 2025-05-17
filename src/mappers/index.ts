@@ -1,2 +1,3 @@
 export * from './UserMapper';
-export * from './ResponseMapper'; 
+export * from './ResponseMapper';
+export * from './AnalyticsMapper'; 

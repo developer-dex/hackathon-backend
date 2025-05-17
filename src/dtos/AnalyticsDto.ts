@@ -23,6 +23,12 @@ export interface DayActivity {
   percentage: number;
 }
 
+export interface TrendingCategory {
+  id: string;
+  name: string;
+  count: number;
+}
+
 export interface AnalyticsRequestDto {
   timePeriod: TimePeriod;
   teamId?: string;
@@ -34,6 +40,7 @@ export interface AnalyticsRequestDto {
 
 export interface AnalyticsResponseDto {
   topRecognizedIndividuals: RecognizedIndividual[];
+  topTrendingCategories: TrendingCategory[];
   topTeams: TeamAnalytics[];
   totalKudos: number;
   avgKudosPerPerson: number;

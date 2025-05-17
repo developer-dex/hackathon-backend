@@ -10,8 +10,8 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-default-jwt-secret-key';
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1d';
+const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN;
 
 export class UserRepositoryImpl implements IUserRepository {
   async findByEmail(email: string): Promise<User | null> {
@@ -103,6 +103,58 @@ export class UserRepositoryImpl implements IUserRepository {
       return UserMapper.toDomain(savedUser);
     } catch (error) {
       console.error('Error creating user:', error);
+      return null;
+    }
+  }
+
+  async getAllUsers(role?: string, limit?: number, offset: number = 0): Promise<User[]> {
+    try {
+      const query = role ? { role } : {};
+      
+      let dbQuery = UserModel.find(query)
+        .sort({ createdAt: -1 })
+        .skip(offset);
+
+      if (limit) {
+        dbQuery = dbQuery.limit(limit);
+      }
+      
+      const users = await dbQuery.exec();
+      
+      return users
+        .map(user => UserMapper.toDomain(user))
+        .filter((user): user is User => user !== null);
+    } catch (error) {
+      console.error('Error getting all users:', error);
+      return [];
+    }
+  }
+
+  async getTotalUsersCount(role?: string): Promise<number> {
+    try {
+      const query = role ? { role } : {};
+      return await UserModel.countDocuments(query);
+    } catch (error) {
+      console.error('Error getting total users count:', error);
+      return 0;
+    }
+  }
+
+  async updateVerificationStatus(userId: string, status: VerificationStatus): Promise<User | null> {
+    try {
+      const updatedUser = await UserModel.findByIdAndUpdate(
+        userId,
+        { verificationStatus: status },
+        { new: true } // Return the updated document
+      );
+      
+      if (!updatedUser) {
+        return null;
+      }
+      
+      return UserMapper.toDomain(updatedUser);
+    } catch (error) {
+      console.error('Error updating user verification status:', error);
       return null;
     }
   }

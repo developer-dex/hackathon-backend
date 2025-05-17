@@ -17,7 +17,7 @@ export interface CreateKudosDTO {
   senderId: string;
   receiverId: string;
   categoryId: string;
-  teamId: string;
+  teamId?: string;
   message: string;
 }
 
