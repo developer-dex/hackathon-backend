@@ -1,11 +1,11 @@
-import { ApiResponseDto } from '../../dtos/ApiResponseDto';
-import { SignupRequestDto, SignupResponseDto } from '../../dtos/SignupDto';
-import { UserRepository } from '../../domain/repositories/UserRepository';
-import { UserMapper } from '../../mappers/UserMapper';
-import { ResponseMapper } from '../../mappers/ResponseMapper';
+import { SignupRequestDto, SignupResponseDto } from '../../../dtos/AuthDto';
+import { IUserRepository } from '../../../domain/interfaces/repositories/IUserRepository';
+import { UserMapper } from '../../../mappers/UserMapper';
+import { ResponseMapper } from '../../../mappers/ResponseMapper';
+import { ApiResponseDto } from '../../../dtos/ApiResponseDto';
 
 export class Signup {
-  constructor(private userRepository: UserRepository) {}
+  constructor(private userRepository: IUserRepository) {}
 
   async execute(dto: SignupRequestDto): Promise<ApiResponseDto<SignupResponseDto>> {
     try {

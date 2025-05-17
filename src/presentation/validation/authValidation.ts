@@ -1,7 +1,7 @@
 import Joi from 'joi';
-import { LoginRequestDto } from '../../dtos/UserDto';
-import { SignupRequestDto } from '../../dtos/SignupDto';
-import { UserRole } from '../../domain/entities/User';
+import { LoginRequestDto } from '../../dtos/AuthDto';
+import { SignupRequestDto } from '../../dtos/AuthDto';
+import { EUserRole } from '../../domain/entities/User';
 
 export const validateLoginRequest = (data: LoginRequestDto) => {
   const schema = Joi.object({
@@ -69,7 +69,7 @@ export const validateSignupRequest = (data: SignupRequestDto) => {
       }),
       
     role: Joi.string()
-      .valid(...Object.values(UserRole))
+      .valid(...Object.values(EUserRole))
       .required()
       .messages({
         'string.empty': 'Role is required',

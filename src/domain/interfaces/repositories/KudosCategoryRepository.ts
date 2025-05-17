@@ -1,5 +1,5 @@
-import { KudosCategory } from '../entities/KudosCategory';
-import { CreateKudosCategoryDTO, UpdateKudosCategoryDTO } from '../../dtos/KudosCategoryDto';
+import { KudosCategory } from '../../entities/KudosCategory';
+import { CreateKudosCategoryDTO, UpdateKudosCategoryDTO } from '../../../dtos/KudosCategoryDto';
 
 export interface IKudosCategoryRepository {
   createCategory(categoryData: CreateKudosCategoryDTO): Promise<KudosCategory | null>;

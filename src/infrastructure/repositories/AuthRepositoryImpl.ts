@@ -1,6 +1,6 @@
 import { User, UserDTO } from '../../domain/entities/User';
 import { UserRepositoryImpl } from './UserRepositoryImpl';
-import { AuthRepository } from '../../domain/repositories/AuthRepository';
+import { AuthRepository } from '../../domain/interfaces/repositories/AuthRepository';
 
 export class AuthRepositoryImpl implements AuthRepository {
   private userRepository: UserRepositoryImpl;

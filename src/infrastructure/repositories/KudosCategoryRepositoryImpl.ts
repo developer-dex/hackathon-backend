@@ -1,4 +1,4 @@
-import { IKudosCategoryRepository } from '../../domain/interfaces/KudosCategoryRepository';
+import { IKudosCategoryRepository } from '../../domain/interfaces/repositories/KudosCategoryRepository';
 import { KudosCategory } from '../../domain/entities/KudosCategory';
 import { CreateKudosCategoryDTO, UpdateKudosCategoryDTO } from '../../dtos/KudosCategoryDto';
 import { KudosCategoryModel, seedDefaultCategories } from '../database/models/KudosCategoryModel';

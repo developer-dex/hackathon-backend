@@ -1,58 +1,72 @@
 import { Request, Response, NextFunction } from 'express';
-import { UserRepository } from '../../domain/repositories/UserRepository';
-import { UserDTO } from '../../dtos/UserDto';
-import { UserRole } from '../../domain/entities/User';
+import { UserDTO } from '../../dtos/AuthDto';
+import { IUserRepository } from '../../domain/interfaces/repositories/IUserRepository';
 import { ResponseMapper } from '../../mappers/ResponseMapper';
+import jwt from 'jsonwebtoken';
+import { EUserRole } from '../../domain/entities/User';
 
-interface AuthenticatedRequest extends Request {
+// Extend the Request interface to include the user property
+export interface AuthenticatedRequest extends Request {
   user?: UserDTO;
 }
 
 export class AuthMiddleware {
-  constructor(private userRepository: UserRepository) {}
+  private userRepository: IUserRepository;
 
-  authenticate = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  constructor(userRepository: IUserRepository) {
+    this.userRepository = userRepository;
+    // Bind methods to ensure 'this' context is preserved
+    this.verifyToken = this.verifyToken.bind(this);
+    this.requireTeamLead = this.requireTeamLead.bind(this);
+  }
+
+  /**
+   * Express middleware to verify JWT token from Authorization header
+   */
+  verifyToken = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
-      // Get token from the Authorization header
       const authHeader = req.headers.authorization;
       
       if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        const response = ResponseMapper.unauthorized('Authorization token is required');
-        res.status(401).json(response);
+        res.status(401).json(ResponseMapper.error('Unauthorized: No token provided', 'Authorization header must be provided with Bearer token'));
         return;
       }
-      
+
       const token = authHeader.split(' ')[1];
       
-      // Verify token
+      if (!token) {
+        res.status(401).json(ResponseMapper.error('Unauthorized: Invalid token format', 'Token must be provided in the format "Bearer token"'));
+        return;
+      }
+
+      // Verify token with user repository
       const user = await this.userRepository.verifyToken(token);
       
       if (!user) {
-        const response = ResponseMapper.unauthorized('Invalid or expired token');
-        res.status(401).json(response);
+        res.status(401).json(ResponseMapper.error('Unauthorized: Invalid token', 'Token is invalid or expired'));
         return;
       }
-      
+
       // Attach user to request
       req.user = user;
       next();
     } catch (error) {
-      const response = ResponseMapper.serverError(error instanceof Error ? error : undefined);
-      res.status(500).json(response);
+      console.error('Auth middleware error:', error);
+      res.status(500).json(ResponseMapper.error('Server error', 'An error occurred during authentication'));
     }
   };
 
-  // Middleware to check if user is a Team Lead
-  authorizeTeamLead = (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+  /**
+   * Express middleware to enforce team lead role
+   */
+  requireTeamLead = (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
     if (!req.user) {
-      const response = ResponseMapper.unauthorized('User not authenticated');
-      res.status(401).json(response);
+      res.status(401).json(ResponseMapper.error('Unauthorized', 'User not authenticated'));
       return;
     }
 
-    if (req.user.role !== UserRole.TEAM_LEAD) {
-      const response = ResponseMapper.forbidden('This action requires Team Lead privileges');
-      res.status(403).json(response);
+    if (req.user.role !== EUserRole.TEAM_LEAD) {
+      res.status(403).json(ResponseMapper.error('Forbidden', 'This action requires team lead privileges'));
       return;
     }
 

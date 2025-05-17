@@ -1,11 +1,11 @@
 import jwt, { Secret, SignOptions } from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import { UserRepository } from '../../domain/repositories/UserRepository';
 import { User, VerificationStatus } from '../../domain/entities/User';
-import { UserDTO } from '../../dtos/UserDto';
+import { UserDTO } from '../../dtos/AuthDto';
 import { UserModel, UserDocument } from '../database/models/UserModel';
 import { UserMapper } from '../../mappers/UserMapper';
-import { SignupRequestDto } from '../../dtos/SignupDto';
+import { SignupRequestDto } from '../../dtos/AuthDto';
+import { IUserRepository } from '../../domain/interfaces/repositories/IUserRepository';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -13,7 +13,7 @@ dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET || 'your-default-jwt-secret-key';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1d';
 
-export class UserRepositoryImpl implements UserRepository {
+export class UserRepositoryImpl implements IUserRepository {
   async findByEmail(email: string): Promise<User | null> {
     try {
       const user = await UserModel.findOne({ email });
@@ -22,6 +22,18 @@ export class UserRepositoryImpl implements UserRepository {
       return UserMapper.toDomain(user);
     } catch (error) {
       console.error('Error getting user by email:', error);
+      return null;
+    }
+  }
+
+  async findById(id: string): Promise<User | null> {
+    try {
+      const user = await UserModel.findById(id);
+      if (!user) return null;
+      
+      return UserMapper.toDomain(user);
+    } catch (error) {
+      console.error('Error getting user by ID:', error);
       return null;
     }
   }

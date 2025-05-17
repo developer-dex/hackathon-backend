@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { Login } from '../../application/useCases/Login';
-import { Signup } from '../../application/useCases/Signup';
-import { LoginRequestDto } from '../../dtos/UserDto';
-import { SignupRequestDto } from '../../dtos/SignupDto';
+import { Login } from '../../application/useCases/auth/Login';
+import { Signup } from '../../application/useCases/auth/Signup';
+import { LoginRequestDto } from '../../dtos/AuthDto';
+import { SignupRequestDto } from '../../dtos/AuthDto';
 import { validateLoginRequest, validateSignupRequest } from '../validation/authValidation';
 import { ResponseMapper } from '../../mappers/ResponseMapper';
 
@@ -25,7 +25,7 @@ export class AuthController {
       }
       
       // Execute login use case
-      const loginRequest: LoginRequestDto = {
+      const loginRequest = {
         email: value.email,
         password: value.password
       };
