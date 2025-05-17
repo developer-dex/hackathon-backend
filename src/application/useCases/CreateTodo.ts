@@ -1,5 +1,5 @@
 import { Todo } from '../../domain/entities/Todo';
-import { TodoRepository } from '../../domain/interfaces/TodoRepository';
+import { TodoRepository } from '../../domain/repositories/TodoRepository';
 import { CreateTodoDto, TodoResponseDto } from '../../dtos/TodoDto';
 import { TodoMapper } from '../../mappers/TodoMapper';
 

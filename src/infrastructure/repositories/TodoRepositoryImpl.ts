@@ -1,5 +1,5 @@
 import { Todo } from '../../domain/entities/Todo';
-import { TodoRepository } from '../../domain/interfaces/TodoRepository';
+import { TodoRepository } from '../../domain/repositories/TodoRepository';
 import { TodoModel, TodoDocument } from '../database/models/TodoModel';
 
 export class TodoRepositoryImpl implements TodoRepository {
