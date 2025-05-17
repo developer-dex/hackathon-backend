@@ -5,7 +5,7 @@ export interface IKudosCategoryRepository {
   createCategory(categoryData: CreateKudosCategoryDTO): Promise<KudosCategory | null>;
   getCategoryById(id: string): Promise<KudosCategory | null>;
   getCategoryByName(name: string): Promise<KudosCategory | null>;
-  getAllCategories(activeOnly?: boolean): Promise<KudosCategory[]>;
+  getAllCategories(): Promise<KudosCategory[]>;
   updateCategory(id: string, categoryData: UpdateKudosCategoryDTO): Promise<KudosCategory | null>;
   deleteCategory(id: string): Promise<boolean>;
   initializeDefaultCategories(): Promise<void>;

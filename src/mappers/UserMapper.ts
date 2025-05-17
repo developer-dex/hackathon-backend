@@ -11,13 +11,12 @@ export class UserMapper {
    * Map from User entity to UserDTO (for API responses)
    * Removes sensitive information like password
    */
-  public static toDTO(user: User): UserDTO {
+  public static toDTO(user: User): Omit<UserDTO, 'teamId'> {
     return {
       id: user.getId(),
       name: user.getName(),
       email: user.getEmail(),
       role: user.getRole(),
-      department: user.getDepartment(),
       verificationStatus: user.getVerificationStatus(),
       createdAt: user.getCreatedAt(),
       updatedAt: user.getUpdatedAt()
@@ -38,7 +37,7 @@ export class UserMapper {
       email: userDocument.email,
       password: userDocument.password,
       role: userDocument.role,
-      department: userDocument.department,
+      teamId: userDocument.teamId.toString(),
       verificationStatus: userDocument.verificationStatus,
       createdAt: userDocument.createdAt.toISOString(),
       updatedAt: userDocument.updatedAt.toISOString()

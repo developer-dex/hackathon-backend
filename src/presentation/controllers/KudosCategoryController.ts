@@ -13,6 +13,11 @@ export class KudosCategoryController {
 
   async createCategory(req: Request, res: Response): Promise<void> {
     try {
+      // If a file was uploaded, use the filename as the icon value
+      if (req.file) {
+        req.body.icon = req.file.filename;
+      }
+
       // Validate request data
       const { error, value } = validateCategoryRequest(req.body);
       
@@ -44,10 +49,9 @@ export class KudosCategoryController {
   async getAllCategories(req: Request, res: Response): Promise<void> {
     try {
       // Get "activeOnly" parameter from query
-      const activeOnly = req.query.activeOnly !== 'false';
       
       // Execute use case
-      const result = await this.getAllKudosCategoriesUseCase.execute(activeOnly);
+      const result = await this.getAllKudosCategoriesUseCase.execute();
       
       if (result.success) {
         res.status(200).json(result);

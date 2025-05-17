@@ -7,13 +7,13 @@ import { ResponseMapper } from '../../../mappers/ResponseMapper';
 export class GetAllKudosCategories {
   constructor(private kudosCategoryRepository: IKudosCategoryRepository) {}
 
-  async execute(activeOnly: boolean = true): Promise<ApiResponseDto<KudosCategoryDTO[]>> {
+  async execute(): Promise<ApiResponseDto<KudosCategoryDTO[]>> {
     try {
       // Get all categories
-      const categories = await this.kudosCategoryRepository.getAllCategories(activeOnly);
+      const retriveCategories = await this.kudosCategoryRepository.getAllCategories();
       
       // Map to DTOs
-      // const categoryDTOs = categories.map(category => KudosCategoryMapper.toDTO(category));
+      const categories = retriveCategories.map(category => KudosCategoryMapper.toDTO(category));
       
       return ResponseMapper.success(
         categories,

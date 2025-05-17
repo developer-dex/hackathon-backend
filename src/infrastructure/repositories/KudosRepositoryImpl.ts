@@ -1,10 +1,12 @@
-import { IKudosRepository } from '../../domain/interfaces/repositories/KudosRepository';
+import { IKudosRepository, KudosFilters } from '../../domain/interfaces/repositories/KudosRepository';
 import { Kudos } from '../../domain/entities/Kudos';
 import { CreateKudosDTO, KudosDTO, KudosListItemDTO } from '../../dtos/KudosDto';
 import { KudosModel } from '../database/models/KudosModel';
 import { KudosMapper } from '../../mappers/KudosMapper';
 import { UserModel } from '../database/models/UserModel';
 import { KudosCategoryModel } from '../database/models/KudosCategoryModel';
+import { TeamModel } from '../database/models/TeamModel';
+import mongoose from 'mongoose';
 
 export class KudosRepositoryImpl implements IKudosRepository {
   async createKudos(kudosData: CreateKudosDTO): Promise<Kudos | null> {
@@ -37,13 +39,14 @@ export class KudosRepositoryImpl implements IKudosRepository {
       const sender = await UserModel.findById(kudos.senderId);
       const receiver = await UserModel.findById(kudos.receiverId);
       const category = await KudosCategoryModel.findById(kudos.categoryId);
+      const team = await TeamModel.findById(kudos.teamId);
 
-      if (!sender || !receiver || !category) return null;
+      if (!sender || !receiver || !category || !team) return null;
 
       const kudosDomain = KudosMapper.toDomain(kudos);
       if (!kudosDomain) return null;
 
-      return KudosMapper.toDTO(kudosDomain, sender, receiver, category);
+      return KudosMapper.toDTO(kudosDomain, sender, receiver, category, team);
     } catch (error) {
       console.error('Error getting populated kudos:', error);
       return null;
@@ -70,20 +73,22 @@ export class KudosRepositoryImpl implements IKudosRepository {
     }
   }
 
-  async getAllKudos(limit?: number, offset: number = 0): Promise<Kudos[]> {
+  async getAllKudos(limit?: number, offset: number = 0, filters?: KudosFilters): Promise<Kudos[]> {
     try {
-      let query = KudosModel.find()
+      const query = this.buildQueryFilters(filters);
+      
+      let dbQuery = KudosModel.find(query)
         .sort({ createdAt: -1 });
       
       if (offset) {
-        query = query.skip(offset);
+        dbQuery = dbQuery.skip(offset);
       }
 
       if (limit) {
-        query = query.limit(limit);
+        dbQuery = dbQuery.limit(limit);
       }
 
-      const kudos = await query;
+      const kudos = await dbQuery;
       return KudosMapper.toDomainList(kudos);
     } catch (error) {
       console.error('Error getting all kudos:', error);
@@ -91,31 +96,34 @@ export class KudosRepositoryImpl implements IKudosRepository {
     }
   }
 
-  async getAllKudosPopulated(limit?: number, offset: number = 0): Promise<KudosListItemDTO[]> {
+  async getAllKudosPopulated(limit?: number, offset: number = 0, filters?: KudosFilters): Promise<KudosListItemDTO[]> {
     try {
-      let query = KudosModel.find()
+      const query = this.buildQueryFilters(filters);
+      
+      let dbQuery = KudosModel.find(query)
         .sort({ createdAt: -1 });
       
       if (offset) {
-        query = query.skip(offset);
+        dbQuery = dbQuery.skip(offset);
       }
 
       if (limit) {
-        query = query.limit(limit);
+        dbQuery = dbQuery.limit(limit);
       }
 
-      const kudos = await query.exec();
+      const kudos = await dbQuery.exec();
       const result: KudosListItemDTO[] = [];
 
       for (const kudosDoc of kudos) {
         const sender = await UserModel.findById(kudosDoc.senderId);
         const receiver = await UserModel.findById(kudosDoc.receiverId);
         const category = await KudosCategoryModel.findById(kudosDoc.categoryId);
+        const team = await TeamModel.findById(kudosDoc.teamId);
 
-        if (sender && receiver && category) {
+        if (sender && receiver && category && team) {
           const kudosDomain = KudosMapper.toDomain(kudosDoc);
           if (kudosDomain) {
-            result.push(KudosMapper.toListItemDTO(kudosDomain, sender, receiver, category));
+            result.push(KudosMapper.toListItemDTO(kudosDomain, sender, receiver, category, team));
           }
         }
       }
@@ -127,12 +135,57 @@ export class KudosRepositoryImpl implements IKudosRepository {
     }
   }
 
-  async getTotalCount(): Promise<number> {
+  async getTotalCount(filters?: KudosFilters): Promise<number> {
     try {
-      return await KudosModel.countDocuments();
+      const query = this.buildQueryFilters(filters);
+      return await KudosModel.countDocuments(query);
     } catch (error) {
-      console.error('Error getting total count:', error);
+      console.error('Error getting kudos count:', error);
       return 0;
     }
+  }
+
+  /**
+   * Builds the MongoDB query based on provided filters
+   * @param filters Optional filters for the query
+   * @returns MongoDB query object
+   */
+  private buildQueryFilters(filters?: KudosFilters): Record<string, any> {
+    const query: Record<string, any> = {};
+    
+    if (!filters) {
+      return query;
+    }
+    
+    if (filters.teamId) {
+      query.teamId = new mongoose.Types.ObjectId(filters.teamId);
+    }
+    
+    if (filters.categoryId) {
+      query.categoryId = new mongoose.Types.ObjectId(filters.categoryId);
+    }
+    
+    if (filters.senderId) {
+      query.senderId = new mongoose.Types.ObjectId(filters.senderId);
+    }
+    
+    if (filters.receiverId) {
+      query.receiverId = new mongoose.Types.ObjectId(filters.receiverId);
+    }
+    
+    // Add date range filtering
+    if (filters.startDate || filters.endDate) {
+      query.createdAt = {};
+      
+      if (filters.startDate) {
+        query.createdAt.$gte = filters.startDate;
+      }
+      
+      if (filters.endDate) {
+        query.createdAt.$lte = filters.endDate;
+      }
+    }
+    
+    return query;
   }
 } 

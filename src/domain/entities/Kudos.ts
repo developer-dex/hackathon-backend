@@ -12,8 +12,8 @@ export class Kudos {
     public readonly senderId: string,
     public readonly receiverId: string,
     public readonly categoryId: string,
+    public readonly teamId: string,
     public readonly message: string,
-    public readonly teamName: string,
     public readonly createdAt: string,
     public readonly updatedAt: string
   ) {}
@@ -23,8 +23,8 @@ export class Kudos {
     senderId: string;
     receiverId: string;
     categoryId: string;
+    teamId: string;
     message: string;
-    teamName: string;
     createdAt: string;
     updatedAt: string;
   }): Kudos {
@@ -33,10 +33,42 @@ export class Kudos {
       props.senderId,
       props.receiverId,
       props.categoryId,
+      props.teamId,
       props.message,
-      props.teamName,
       props.createdAt,
       props.updatedAt
     );
+  }
+
+  getId(): string {
+    return this.id;
+  }
+
+  getSenderId(): string {
+    return this.senderId;
+  }
+
+  getReceiverId(): string {
+    return this.receiverId;
+  }
+
+  getCategoryId(): string {
+    return this.categoryId;
+  }
+
+  getTeamId(): string {
+    return this.teamId;
+  }
+
+  getMessage(): string {
+    return this.message;
+  }
+
+  getCreatedAt(): string {
+    return this.createdAt;
+  }
+
+  getUpdatedAt(): string {
+    return this.updatedAt;
   }
 } 

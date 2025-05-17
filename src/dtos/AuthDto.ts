@@ -5,7 +5,7 @@ export interface UserDTO {
   name: string;
   email: string;
   role: EUserRole;
-  department: string;
+  teamId?: string;
   verificationStatus: VerificationStatus;
   createdAt: string;
   updatedAt: string;
@@ -27,7 +27,7 @@ export interface SignupRequestDto {
   password: string;
   confirmPassword: string;
   role: EUserRole;
-  department: string;
+  teamId: string;
 }
 
 export interface SignupResponseDto {
@@ -35,7 +35,10 @@ export interface SignupResponseDto {
   name: string;
   email: string;
   role: EUserRole;
-  department: string;
+  team: {
+    id: string;
+    name: string;
+  };
   createdAt: string;
   updatedAt: string;
 }

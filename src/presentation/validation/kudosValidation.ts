@@ -30,6 +30,15 @@ export const validateKudosRequest = (data: CreateKudosDTO) => {
         'any.required': 'Category ID is required'
       }),
       
+    teamId: Joi.string()
+      .required()
+      .pattern(/^[0-9a-fA-F]{24}$/)
+      .messages({
+        'string.empty': 'Team ID is required',
+        'string.pattern.base': 'Team ID must be a valid MongoDB ObjectId',
+        'any.required': 'Team ID is required'
+      }),
+      
     message: Joi.string()
       .required()
       .trim()
@@ -40,18 +49,6 @@ export const validateKudosRequest = (data: CreateKudosDTO) => {
         'string.min': 'Message must be at least 5 characters long',
         'string.max': 'Message cannot exceed 500 characters',
         'any.required': 'Message is required'
-      }),
-
-    teamName: Joi.string()
-      .required()
-      .trim()
-      .min(2)
-      .max(100)
-      .messages({
-        'string.empty': 'Team name is required',
-        'string.min': 'Team name must be at least 2 characters long',
-        'string.max': 'Team name cannot exceed 100 characters',
-        'any.required': 'Team name is required'
       })
   });
 

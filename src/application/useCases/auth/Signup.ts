@@ -1,11 +1,15 @@
 import { SignupRequestDto, SignupResponseDto } from '../../../dtos/AuthDto';
 import { IUserRepository } from '../../../domain/interfaces/repositories/IUserRepository';
+import { ITeamRepository } from '../../../domain/interfaces/repositories/TeamRepository';
 import { UserMapper } from '../../../mappers/UserMapper';
 import { ResponseMapper } from '../../../mappers/ResponseMapper';
 import { ApiResponseDto } from '../../../dtos/ApiResponseDto';
 
 export class Signup {
-  constructor(private userRepository: IUserRepository) {}
+  constructor(
+    private userRepository: IUserRepository,
+    private teamRepository: ITeamRepository
+  ) {}
 
   async execute(dto: SignupRequestDto): Promise<ApiResponseDto<SignupResponseDto>> {
     try {
@@ -20,6 +24,12 @@ export class Signup {
         return ResponseMapper.validationError('Email is already registered');
       }
 
+      // Check if team exists
+      const team = await this.teamRepository.getTeamById(dto.teamId);
+      if (!team) {
+        return ResponseMapper.validationError('Selected team does not exist');
+      }
+
       // Create user
       const newUser = await this.userRepository.createUser(dto);
       
@@ -30,8 +40,17 @@ export class Signup {
       // Map to DTO without sensitive data
       const userDTO = UserMapper.toDTO(newUser);
       
+      // Create response with team info
+      const signupResponse: SignupResponseDto = {
+        ...userDTO,
+        team: {
+          id: team.id,
+          name: team.name
+        }
+      };
+      
       return ResponseMapper.success(
-        userDTO,
+        signupResponse,
         'User registered successfully. Verification status is pending.'
       );
     } catch (error) {
