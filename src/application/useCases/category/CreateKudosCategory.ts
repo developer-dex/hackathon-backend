@@ -1,6 +1,6 @@
 import { ApiResponseDto } from '../../../dtos/ApiResponseDto';
 import { CreateKudosCategoryDTO, KudosCategoryDTO } from '../../../dtos/KudosCategoryDto';
-import { IKudosCategoryRepository } from '../../../domain/interfaces/KudosCategoryRepository';
+import { IKudosCategoryRepository } from '../../../domain/interfaces/repositories/KudosCategoryRepository';
 import { KudosCategoryMapper } from '../../../mappers/KudosCategoryMapper';
 import { ResponseMapper } from '../../../mappers/ResponseMapper';
 

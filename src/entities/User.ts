@@ -1,4 +1,4 @@
-export enum UserRole {
+export enum EUserRole {
   TEAM_MEMBER = 'TEAM_MEMBER',
   TEAM_LEAD = 'TEAM_LEAD'
 }
@@ -14,7 +14,7 @@ export interface User {
   name: string;
   email: string;
   password: string;
-  role: UserRole;
+  role: EUserRole;
   department: string;
   verificationStatus: VerificationStatus;
   createdAt: string;
@@ -25,7 +25,7 @@ export interface UserDTO {
   id: string;
   name: string;
   email: string;
-  role: UserRole;
+  role: EUserRole;
   department: string;
   verificationStatus: VerificationStatus;
   createdAt: string;

@@ -1,4 +1,4 @@
-import { UserDTO } from './UserDto';
+import { UserDTO } from './AuthDto';
 import { KudosCategoryDTO } from './KudosCategoryDto';
 
 export interface KudosDTO {

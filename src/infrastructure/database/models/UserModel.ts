@@ -1,12 +1,12 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
-import { UserRole, VerificationStatus } from '../../../domain/entities/User';
+import { EUserRole, VerificationStatus } from '../../../domain/entities/User';
 
 export interface UserDocument extends Document {
   name: string;
   email: string;
   password: string;
-  role: UserRole;
+  role: EUserRole;
   department: string;
   verificationStatus: VerificationStatus;
   createdAt: Date;
@@ -40,8 +40,8 @@ const userSchema = new Schema(
     },
     role: {
       type: String,
-      enum: Object.values(UserRole),
-      default: UserRole.TEAM_MEMBER
+      enum: Object.values(EUserRole),
+      default: EUserRole.TEAM_MEMBER
     },
     department: {
       type: String,

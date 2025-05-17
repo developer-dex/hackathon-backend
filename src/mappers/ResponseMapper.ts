@@ -1,4 +1,4 @@
-import { ApiResponseDto } from '../dtos/ApiResponseDto';
+import { ApiResponseDto, PaginationMeta } from '../dtos/ApiResponseDto';
 
 /**
  * ResponseMapper - Responsible for creating standardized API responses
@@ -8,11 +8,16 @@ export class ResponseMapper {
   /**
    * Create a successful response with data
    */
-  public static success<T>(data: T, message = 'Success'): ApiResponseDto<T> {
+  public static success<T>(
+    data: T, 
+    message = 'Success', 
+    pagination?: PaginationMeta
+  ): ApiResponseDto<T> {
     return {
       success: true,
       data,
-      message
+      message,
+      ...(pagination && { pagination })
     };
   }
 

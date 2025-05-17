@@ -1,12 +1,12 @@
-import { ApiResponseDto } from '../../dtos/ApiResponseDto';
-import { LoginRequestDto, LoginResponseDto } from '../../dtos/UserDto';
-import { UserRepository } from '../../domain/repositories/UserRepository';
-import { UserMapper } from '../../mappers/UserMapper';
-import { ResponseMapper } from '../../mappers/ResponseMapper';
-import { VerificationStatus } from '../../domain/entities/User';
+import { ApiResponseDto } from '../../../dtos/ApiResponseDto';
+import { LoginRequestDto, LoginResponseDto } from '../../../dtos/AuthDto';
+import { IUserRepository } from '../../../domain/interfaces/repositories/IUserRepository';
+import { UserMapper } from '../../../mappers/UserMapper';
+import { ResponseMapper } from '../../../mappers/ResponseMapper';
+import { VerificationStatus } from '../../../domain/entities/User';
 
 export class Login {
-  constructor(private userRepository: UserRepository) {}
+  constructor(private userRepository: IUserRepository) {}
 
   async execute(dto: LoginRequestDto): Promise<ApiResponseDto<LoginResponseDto>> {
     try {

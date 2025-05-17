@@ -1,6 +1,5 @@
-import { User as DomainUser, UserRole, VerificationStatus } from '../domain/entities/User';
-import { User as EntityUser, VerificationStatus as EntityVerificationStatus } from '../entities/User';
-import { UserDTO } from '../dtos/UserDto';
+import { User as DomainUser, EUserRole, User, VerificationStatus } from '../domain/entities/User';
+import { UserDTO } from '../dtos/AuthDto';
 import { UserDocument } from '../infrastructure/database/models/UserModel';
 
 /**
@@ -12,16 +11,16 @@ export class UserMapper {
    * Map from User entity to UserDTO (for API responses)
    * Removes sensitive information like password
    */
-  public static toDTO(user: DomainUser | EntityUser): UserDTO {
+  public static toDTO(user: User): UserDTO {
     return {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      department: user.department,
-      verificationStatus: user.verificationStatus,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt
+      id: user.getId(),
+      name: user.getName(),
+      email: user.getEmail(),
+      role: user.getRole(),
+      department: user.getDepartment(),
+      verificationStatus: user.getVerificationStatus(),
+      createdAt: user.getCreatedAt(),
+      updatedAt: user.getUpdatedAt()
     };
   }
 

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { AuthController } from '../controllers/AuthController';
-import { Login } from '../../application/useCases/Login';
-import { Signup } from '../../application/useCases/Signup';
+import { Login } from '../../application/useCases/auth/Login';
+import { Signup } from '../../application/useCases/auth/Signup';
 import { UserRepositoryImpl } from '../../infrastructure/repositories/UserRepositoryImpl';
 
 export const authRouter = Router();
