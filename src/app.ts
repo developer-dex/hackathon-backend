@@ -2,8 +2,9 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import helmet from 'helmet';
-import { config } from './config';
-import { authRouter } from './interfaces/routes/authRoutes';
+import morgan from 'morgan';
+import router from './presentation/routes/index';
+import { config } from './config/config';
 
 // Create Express app
 const app = express();
@@ -11,6 +12,7 @@ const app = express();
 // Middleware
 app.use(helmet());
 app.use(cors());
+app.use(morgan('dev'));
 app.use(express.json());
 
 // Connect to MongoDB
@@ -25,7 +27,7 @@ mongoose
   });
 
 // API routes
-app.use('/api/auth', authRouter);
+app.use('/api', router);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
