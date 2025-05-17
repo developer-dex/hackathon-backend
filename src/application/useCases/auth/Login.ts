@@ -20,7 +20,7 @@ export class Login {
       // If user not found
       if (!user) {
         console.log('User not found');
-        return ResponseMapper.notFound('Invalid email or password');
+        return ResponseMapper.notFound('User not found');
       }
       
       // Check if user is verified

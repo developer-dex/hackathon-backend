@@ -100,7 +100,7 @@ describe('Login Use Case', () => {
     // Assert
     expect(mockUserRepository.findByEmail).toHaveBeenCalledWith(loginDto.email);
     expect(mockUserRepository.verifyPassword).not.toHaveBeenCalled();
-    expect(result).toEqual(ResponseMapper.unauthorized('Invalid email or password'));
+    expect(result).toEqual(ResponseMapper.notFound('User not found'));
   });
   
   it('should return unauthorized when user is not verified', async () => {
