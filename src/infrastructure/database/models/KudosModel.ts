@@ -5,6 +5,7 @@ export interface KudosDocument extends Document {
   receiverId: mongoose.Types.ObjectId;
   categoryId: mongoose.Types.ObjectId;
   message: string;
+  teamName: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -32,6 +33,13 @@ const kudosSchema = new Schema(
       trim: true,
       minlength: 5,
       maxlength: 500
+    },
+    teamName: {
+      type: String,
+      required: true,
+      trim: true,
+      minlength: 2,
+      maxlength: 100
     }
   },
   {
@@ -42,5 +50,6 @@ const kudosSchema = new Schema(
 // Add index for efficient querying of kudos by sender and receiver
 kudosSchema.index({ senderId: 1, receiverId: 1 });
 kudosSchema.index({ categoryId: 1 }); // Index for category queries
+kudosSchema.index({ teamName: 1 }); // Index for team name queries
 
 export const KudosModel = mongoose.model<KudosDocument>('Kudos', kudosSchema); 

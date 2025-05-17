@@ -13,6 +13,7 @@ export class Kudos {
     public readonly receiverId: string,
     public readonly categoryId: string,
     public readonly message: string,
+    public readonly teamName: string,
     public readonly createdAt: string,
     public readonly updatedAt: string
   ) {}
@@ -23,6 +24,7 @@ export class Kudos {
     receiverId: string;
     categoryId: string;
     message: string;
+    teamName: string;
     createdAt: string;
     updatedAt: string;
   }): Kudos {
@@ -32,6 +34,7 @@ export class Kudos {
       props.receiverId,
       props.categoryId,
       props.message,
+      props.teamName,
       props.createdAt,
       props.updatedAt
     );

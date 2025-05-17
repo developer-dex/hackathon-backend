@@ -7,6 +7,7 @@ export interface KudosDTO {
   receiver: UserDTO;
   category: KudosCategoryDTO;
   message: string;
+  teamName: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -16,6 +17,7 @@ export interface CreateKudosDTO {
   receiverId: string;
   categoryId: string;
   message: string;
+  teamName: string;
 }
 
 export interface KudosListItemDTO {
@@ -37,5 +39,6 @@ export interface KudosListItemDTO {
     color: string;
   };
   message: string;
+  teamName: string;
   createdAt: string;
 } 

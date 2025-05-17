@@ -27,6 +27,7 @@ export class KudosMapper {
       receiver: UserMapper.documentToDTO(receiverDoc)!,
       category: KudosCategoryMapper.toDomain(categoryDoc)!,
       message: kudos.message,
+      teamName: kudos.teamName,
       createdAt: kudos.createdAt,
       updatedAt: kudos.updatedAt
     };
@@ -61,6 +62,7 @@ export class KudosMapper {
         color: categoryDoc.color
       },
       message: kudos.message,
+      teamName: kudos.teamName,
       createdAt: kudos.createdAt
     };
   }
@@ -79,6 +81,7 @@ export class KudosMapper {
       receiverId: kudosDocument.receiverId.toString(),
       categoryId: kudosDocument.categoryId.toString(),
       message: kudosDocument.message,
+      teamName: kudosDocument.teamName,
       createdAt: kudosDocument.createdAt.toISOString(),
       updatedAt: kudosDocument.updatedAt.toISOString()
     });
