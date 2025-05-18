@@ -1,15 +1,13 @@
-import { User, VerificationStatus } from '../../entities/User';
-import { UserDTO } from '../../../dtos/AuthDto';
-import { SignupRequestDto } from '../../../dtos/AuthDto';
+import { User } from '../../entities/User';
 
 export interface IUserRepository {
-  findByEmail(email: string): Promise<User | null>;
-  findById(id: string): Promise<User | null>;
-  createUser(userData: SignupRequestDto): Promise<User | null>;
-  verifyPassword(providedPassword: string, storedPassword: string): Promise<boolean>;
-  generateToken(user: UserDTO): string;
-  verifyToken(token: string): Promise<UserDTO | null>;
-  getAllUsers(role?: string, limit?: number, offset?: number): Promise<User[]>;
-  getTotalUsersCount(role?: string): Promise<number>;
-  updateVerificationStatus(userId: string, status: VerificationStatus): Promise<User | null>;
+  // ... existing methods ...
+  
+  /**
+   * Update a user's role
+   * @param userId The ID of the user to update
+   * @param role The new role for the user
+   * @returns The updated user or null if not found
+   */
+  updateUserRole(userId: string, role: string): Promise<User | null>;
 } 

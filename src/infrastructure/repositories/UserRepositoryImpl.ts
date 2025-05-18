@@ -5,8 +5,9 @@ import { UserDTO } from '../../dtos/AuthDto';
 import { UserModel, UserDocument } from '../database/models/UserModel';
 import { UserMapper } from '../../mappers/UserMapper';
 import { SignupRequestDto } from '../../dtos/AuthDto';
-import { IUserRepository } from '../../domain/interfaces/repositories/IUserRepository';
+import { IUserRepository } from '../../domain/interfaces/repositories/UserRepository';
 import dotenv from 'dotenv';
+import mongoose, { Mongoose } from 'mongoose';
 
 dotenv.config();
 
@@ -16,12 +17,24 @@ const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN;
 export class UserRepositoryImpl implements IUserRepository {
   async findByEmail(email: string): Promise<User | null> {
     try {
-      const user = await UserModel.findOne({ email });
+      const user = await UserModel.findOne({ email, deletedAt: null });
       if (!user) return null;
       
       return UserMapper.toDomain(user);
     } catch (error) {
       console.error('Error getting user by email:', error);
+      return null;
+    }
+  }
+
+  async findByIdWithoutDeleteUser(id: string): Promise<User | null> {
+    try {
+      const user = await UserModel.findOne({ _id: new mongoose.Types.ObjectId(id), deletedAt: null });
+      if (!user) return null;
+      
+      return UserMapper.toDomain(user);
+    } catch (error) {
+      console.error('Error getting user by ID:', error);
       return null;
     }
   }
@@ -111,8 +124,8 @@ export class UserRepositoryImpl implements IUserRepository {
     try {
       const query = role ? { role } : {};
       
-      let dbQuery = UserModel.find(query)
-        .sort({ createdAt: -1 })
+      let dbQuery = UserModel.find(query).populate('teamId');
+      dbQuery = dbQuery.sort({ createdAt: -1 })
         .skip(offset);
 
       if (limit) {
@@ -120,6 +133,7 @@ export class UserRepositoryImpl implements IUserRepository {
       }
       
       const users = await dbQuery.exec();
+      console.log(users[0]);
       
       return users
         .map(user => UserMapper.toDomain(user))
@@ -155,6 +169,96 @@ export class UserRepositoryImpl implements IUserRepository {
       return UserMapper.toDomain(updatedUser);
     } catch (error) {
       console.error('Error updating user verification status:', error);
+      return null;
+    }
+  }
+
+  async updatePassword(userId: string, newPassword: string): Promise<User | null> {
+    try {
+      // Hash the new password
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      
+      // Update the user's password
+      const updatedUser = await UserModel.findByIdAndUpdate(
+        userId,
+        { password: hashedPassword },
+        { new: true }
+      );
+      
+      if (!updatedUser) {
+        return null;
+      }
+      
+      return UserMapper.toDomain(updatedUser);
+    } catch (error) {
+      console.error('Error updating user password:', error);
+      return null;
+    }
+  }
+
+  async updateUser(userId: string, userData: UserDTO): Promise<User | null> {
+    try {
+      const updatedUser = await UserModel.findByIdAndUpdate(
+        userId,
+        userData,
+        { new: true }
+      );
+      
+      if (!updatedUser) {
+        return null;
+      }
+      
+      return UserMapper.toDomain(updatedUser);
+    } catch (error) {
+      console.error('Error updating user:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Toggle a user's active status (soft delete/restore)
+   * @param userId The ID of the user to update
+   * @param isActive Whether the user should be active (true) or inactive (false)
+   * @returns The updated user or null if the operation failed
+   */
+  async toggleUserActiveStatus(userId: string, isActive: boolean): Promise<User | null> {
+    try {
+      const update = isActive 
+        ? { deletedAt: null } // Remove the deletedAt field to activate the user
+        : { deletedAt: new Date() }; // Set deletedAt to current date to deactivate
+      
+      const updatedUser = await UserModel.findByIdAndUpdate(
+        userId,
+        update,
+        { new: true } // Return the updated document
+      );
+      
+      if (!updatedUser) {
+        return null;
+      }
+      
+      return UserMapper.toDomain(updatedUser);
+    } catch (error) {
+      console.error(`Error ${isActive ? 'activating' : 'deactivating'} user:`, error);
+      return null;
+    }
+  }
+
+  async updateUserRole(userId: string, role: string): Promise<User | null> {
+    try {
+      const user = await UserModel.findOneAndUpdate(
+        { _id: userId, deletedAt: null },
+        { $set: { role } },
+        { new: true }
+      );
+      
+      if (!user) {
+        return null;
+      }
+      
+      return UserMapper.toDomain(user);
+    } catch (error) {
+      console.error('Error updating user role:', error);
       return null;
     }
   }

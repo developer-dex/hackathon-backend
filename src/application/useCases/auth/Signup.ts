@@ -1,5 +1,5 @@
 import { SignupRequestDto, SignupResponseDto } from '../../../dtos/AuthDto';
-import { IUserRepository } from '../../../domain/interfaces/repositories/IUserRepository';
+import { IUserRepository } from '../../../domain/interfaces/repositories/UserRepository';
 import { ITeamRepository } from '../../../domain/interfaces/repositories/TeamRepository';
 import { UserMapper } from '../../../mappers/UserMapper';
 import { ResponseMapper } from '../../../mappers/ResponseMapper';

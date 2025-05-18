@@ -1,14 +1,17 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import { EUserRole, VerificationStatus } from '../../../domain/entities/User';
+import { TeamDocument } from './TeamModel';
+import { TeamDTO } from '../../../dtos/TeamDto';
 
 export interface UserDocument extends Document {
   name: string;
   email: string;
   password: string;
   role: EUserRole;
-  teamId: mongoose.Types.ObjectId;
+  teamId: mongoose.Types.ObjectId | TeamDTO;
   verificationStatus: VerificationStatus;
+  deletedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -52,6 +55,10 @@ const userSchema = new Schema(
       type: String,
       enum: Object.values(VerificationStatus),
       default: VerificationStatus.PENDING
+    },
+    deletedAt: {
+      type: Date,
+      default: null
     }
   },
   {

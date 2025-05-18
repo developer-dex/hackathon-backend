@@ -1,6 +1,6 @@
 import { ApiResponseDto } from '../../../dtos/ApiResponseDto';
 import { AnalyticsRequestDto, AnalyticsResponseDto } from '../../../dtos/AnalyticsDto';
-import { IAnalyticsRepository } from '../../../domain/interfaces/repositories/IAnalyticsRepository';
+import { IAnalyticsRepository } from '../../../domain/interfaces/repositories/AnalyticsRepository';
 import { ResponseMapper } from '../../../mappers/ResponseMapper';
 
 export class GetAnalytics {

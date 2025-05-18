@@ -69,4 +69,13 @@ export class ResponseMapper {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return this.error('Internal server error', errorMessage, 500);
   }
+
+  /**
+   * Create a bad request error response
+   * @param error The error that occurred
+   * @returns An API response with error details
+   */
+  public static badRequest<T>(error: string): ApiResponseDto<T> {
+    return this.error('Bad request', error, 400);
+  }
 } 

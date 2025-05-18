@@ -1,6 +1,6 @@
 import { ApiResponseDto } from '../../../dtos/ApiResponseDto';
 import { LoginRequestDto, LoginResponseDto } from '../../../dtos/AuthDto';
-import { IUserRepository } from '../../../domain/interfaces/repositories/IUserRepository';
+import { IUserRepository } from '../../../domain/interfaces/repositories/UserRepository';
 import { UserMapper } from '../../../mappers/UserMapper';
 import { ResponseMapper } from '../../../mappers/ResponseMapper';
 import { VerificationStatus } from '../../../domain/entities/User';

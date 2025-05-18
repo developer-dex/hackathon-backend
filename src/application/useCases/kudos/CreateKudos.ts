@@ -4,7 +4,7 @@ import { EUserRole } from "../../../domain/entities/User";
 import { UserDTO } from "../../../dtos/AuthDto";
 import { IKudosRepository } from "../../../domain/interfaces/repositories/KudosRepository";
 import { IKudosCategoryRepository } from "../../../domain/interfaces/repositories/KudosCategoryRepository";
-import { IUserRepository } from "../../../domain/interfaces/repositories/IUserRepository";
+import { IUserRepository } from "../../../domain/interfaces/repositories/UserRepository";
 import { ResponseMapper } from "../../../mappers/ResponseMapper";
 import { Kudos } from "../../../domain/entities/Kudos";
 
@@ -33,7 +33,7 @@ export class CreateKudos {
       }
 
       // Verify the receiver exists
-      const receiver = await this.userRepository.findById(dto.receiverId);
+      const receiver = await this.userRepository.findByIdWithoutDeleteUser(dto.receiverId);
       if (!receiver) {
         return ResponseMapper.validationError("Receiver not found");
       }
