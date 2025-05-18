@@ -1,4 +1,4 @@
-import { IUserRepository } from "../../../domain/interfaces/repositories/IUserRepository";
+import { IUserRepository } from "../../../domain/interfaces/repositories/UserRepository";
 import { User } from "../../../domain/entities/User";
 
 export class GetAllUsers {

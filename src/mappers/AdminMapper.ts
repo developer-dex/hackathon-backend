@@ -4,12 +4,13 @@ import { UserListItemDTO } from "../dtos/AdminDto";
 export class AdminMapper {
   static toUserListItemDTO(user: User): UserListItemDTO {
     return {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      verificationStatus: user.verificationStatus,
-      createdAt: new Date(user.createdAt)
+      id: user.getId(),
+      name: user.getName(),
+      email: user.getEmail(),
+      role: user.getRole(),
+      verificationStatus: user.getVerificationStatus(),
+      createdAt: new Date(user.getCreatedAt()),
+      teamId: user.getTeamId()
     };
   }
 

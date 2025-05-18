@@ -21,7 +21,7 @@ app.use(express.static(path.join(process.cwd(), 'public')));
 
 // Connect to MongoDB
 mongoose
-  .connect(config.databaseURL)
+  .connect(config.databaseURL || '')
   .then(() => {
     console.log('Connected to MongoDB');
   })
@@ -58,7 +58,7 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
 });
 
 // Start server
-const PORT = config.port;
+const PORT = config.port || 8000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

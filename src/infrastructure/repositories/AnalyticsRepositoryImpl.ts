@@ -1,4 +1,4 @@
-import { IAnalyticsRepository } from '../../domain/interfaces/repositories/IAnalyticsRepository';
+import { IAnalyticsRepository } from '../../domain/interfaces/repositories/AnalyticsRepository';
 import { AnalyticsRequestDto, AnalyticsResponseDto, TimePeriod } from '../../dtos/AnalyticsDto';
 import { KudosModel } from '../database/models/KudosModel';
 import { UserModel } from '../database/models/UserModel';

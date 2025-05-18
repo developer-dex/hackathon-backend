@@ -1,5 +1,6 @@
 import { User as DomainUser, EUserRole, User, VerificationStatus, UserDTO as DomainUserDTO } from '../domain/entities/User';
 import { UserDTO as AuthUserDTO } from '../dtos/AuthDto';
+import { TeamDTO } from '../dtos/TeamDto';
 import { UserDocument } from '../infrastructure/database/models/UserModel';
 
 /**
@@ -31,16 +32,21 @@ export class UserMapper {
       return null;
     }
 
+    // const team = (typeof userDocument.teamId === 'string') ? userDocument.teamId : (userDocument.teamId as TeamDTO);
+
+    // console.log(typeof team);
+
     return DomainUser.create({
       id: userDocument._id.toString(),
       name: userDocument.name,
       email: userDocument.email,
       password: userDocument.password,
       role: userDocument.role,
-      teamId: userDocument.teamId.toString(),
+      teamId: userDocument.teamId as TeamDTO,
       verificationStatus: userDocument.verificationStatus,
       createdAt: userDocument.createdAt.toISOString(),
-      updatedAt: userDocument.updatedAt.toISOString()
+      updatedAt: userDocument.updatedAt.toISOString(),
+      deletedAt: userDocument.deletedAt ? userDocument.deletedAt.toISOString() : null
     });
   }
 

@@ -1,3 +1,5 @@
+import { TeamDTO } from "./TeamDto";
+
 export interface UserListItemDTO {
   id: string;
   name: string;
@@ -5,6 +7,7 @@ export interface UserListItemDTO {
   role: string;
   verificationStatus: string;
   createdAt: Date;
+  teamId: TeamDTO | undefined;
 }
 
 export interface UsersListResponse {

@@ -5,6 +5,7 @@ export const pagination = (size: number, offset?: number) => {
         offset = 0;
     } else {
         offset = (offset - 1) * size;
+        console.log("offset", offset);
     }
-    return {offset, size};
+    return {size, offset};
 }

@@ -1,3 +1,5 @@
+import { TeamDTO } from "../../dtos/TeamDto";
+
 export enum EUserRole {
   TEAM_MEMBER = 'Team Member',
   TEAM_LEAD = 'Team Lead',
@@ -29,10 +31,11 @@ export class User {
     public readonly email: string,
     public readonly password: string,
     public readonly role: EUserRole,
-    public readonly teamId: string,
+    public readonly teamId: TeamDTO,
     public readonly verificationStatus: VerificationStatus,
     public readonly createdAt: string,
-    public readonly updatedAt: string
+    public readonly updatedAt: string,
+    public readonly deletedAt: string | null = null
   ) {}
 
   static create(props: {
@@ -41,10 +44,11 @@ export class User {
     email: string;
     password: string;
     role: EUserRole;
-    teamId: string;
+    teamId: TeamDTO;
     verificationStatus: VerificationStatus;
     createdAt: string;
     updatedAt: string;
+    deletedAt?: string | null;
   }): User {
     return new User(
       props.id,
@@ -55,7 +59,8 @@ export class User {
       props.teamId,
       props.verificationStatus,
       props.createdAt,
-      props.updatedAt
+      props.updatedAt,
+      props.deletedAt || null
     );
   }
 
@@ -75,7 +80,7 @@ export class User {
     return this.role;
   }
   
-  getTeamId(): string {
+  getTeamId(): TeamDTO {
     return this.teamId;
   }
 
@@ -89,6 +94,14 @@ export class User {
   
   getUpdatedAt(): string {
     return this.updatedAt;
+  }
+
+  getDeletedAt(): string | null {
+    return this.deletedAt;
+  }
+
+  isActive(): boolean {
+    return this.deletedAt === null;
   }
 } 
 

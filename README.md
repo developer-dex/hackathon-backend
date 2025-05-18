@@ -307,6 +307,19 @@ Available status values:
 - 401 Unauthorized: Missing or invalid token
 - 403 Forbidden: User doesn't have admin privileges 
 
+### Change User Team
+```bash
+curl -X PATCH http://localhost:3000/api/admin/users/change-team \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ADMIN_TOKEN" \
+  -d '{
+    "userId": "user_mongodb_id_here",
+    "teamId": "team_mongodb_id_here"
+  }'
+```
+
+Note: The `teamId` must be a valid MongoDB ObjectId of an existing team. You can get team IDs using the GET teams endpoint described above.
+
 ### Kudos API
 
 #### Create Kudos
@@ -355,3 +368,18 @@ curl -X POST \
 - This endpoint requires team lead privileges
 - The authenticated user must have the TEAM_LEAD role
 - The sender must be the authenticated user
+
+## Admin API Examples
+
+### Change User Role
+```bash
+curl -X PATCH http://localhost:3000/api/admin/users/change-role \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ADMIN_TOKEN" \
+  -d '{
+    "userId": "user_mongodb_id_here",
+    "role": "Team Lead"
+  }'
+```
+
+Note: The `role` field must be one of: "Admin", "Team Lead", or "Team Member"
