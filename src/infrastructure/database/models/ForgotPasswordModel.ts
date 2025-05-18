@@ -42,13 +42,8 @@ const forgotPasswordSchema = new Schema(
   }
 );
 
-// Index for faster lookup by token
 forgotPasswordSchema.index({ token: 1 });
-
-// Index for faster lookup by email
 forgotPasswordSchema.index({ email: 1 });
-
-// Index for faster lookup by expiration and used status
 forgotPasswordSchema.index({ expiresAt: 1, isUsed: 1 });
 
 export const ForgotPasswordModel = mongoose.model<ForgotPasswordDocument>('ForgotPassword', forgotPasswordSchema); 

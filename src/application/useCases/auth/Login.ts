@@ -12,33 +12,24 @@ export class Login {
     try {
       const { email, password } = dto;
       
-      // Find user by email
-      const user = await this.userRepository.findByEmail(email);
-
-      console.log(user);
+      const userExist = await this.userRepository.findByEmail(email);
       
-      // If user not found
-      if (!user) {
-        console.log('User not found');
+      if (!userExist) {
         return ResponseMapper.notFound('User not found');
       }
       
-      // Check if user is verified
-      if (user.verificationStatus !== VerificationStatus.VERIFIED) {
+      if (userExist.verificationStatus !== VerificationStatus.VERIFIED) {
         return ResponseMapper.unauthorized('Your account is not verified. Please contact team lead.');
       }
       
-      // Verify password
-      const isPasswordValid = await this.userRepository.verifyPassword(password, user.password);
+      const isPasswordValid = await this.userRepository.verifyPassword(password, userExist.password);
       
       if (!isPasswordValid) {
         return ResponseMapper.unauthorized('Invalid email or password');
       }
       
-      // Create DTO without sensitive data
-      const userDTO = UserMapper.toDTO(user);
+      const userDTO = UserMapper.toDTO(userExist);
       
-      // Generate JWT token
       const token = this.userRepository.generateToken(userDTO);
       
       return ResponseMapper.success(

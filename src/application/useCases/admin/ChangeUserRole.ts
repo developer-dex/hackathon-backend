@@ -25,31 +25,27 @@ export class ChangeUserRole {
     try {
       const { userId, role } = requestDto;
 
-      // Validate the role
       if (!Object.values(EUserRole).includes(role as EUserRole)) {
         return ResponseMapper.badRequest(`Invalid role: ${role}. Valid roles are: ${Object.values(EUserRole).join(', ')}`);
       }
 
-      // Check if user exists
-      const user = await this.userRepository.findById(userId);
-      if (!user) {
+      const userExist = await this.userRepository.findById(userId);
+      if (!userExist) {
         return ResponseMapper.notFound("User not found");
       }
 
-      // If the user already has the specified role, return early
-      if (user.getRole() === role) {
+      if (userExist.getRole() === role) {
         return ResponseMapper.success(
           {
             success: true,
-            user: UserMapper.toDTO(user),
+            user: UserMapper.toDTO(userExist),
             message: `User already has the role ${role}`
           },
           `User already has the role ${role}`
         );
       }
 
-      // Update the user's role
-      const userDto = UserMapper.toDTO(user);
+      const userDto = UserMapper.toDTO(userExist);
       const updatedData = {
         ...userDto,
         role: role as EUserRole
@@ -63,7 +59,6 @@ export class ChangeUserRole {
         );
       }
 
-      // Return success response
       return ResponseMapper.success(
         {
           success: true,

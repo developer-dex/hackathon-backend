@@ -9,14 +9,12 @@ export class CreateTeam {
 
   async execute(dto: CreateTeamDTO): Promise<ApiResponseDto<TeamDTO>> {
     try {
-      // Create the team
       const team = await this.teamRepository.createTeam(dto);
       
       if (!team) {
         return ResponseMapper.serverError(new Error('Failed to create team'));
       }
 
-      // Map to DTO
       const teamDTO = TeamMapper.toDTO(team);
       
       return ResponseMapper.success(

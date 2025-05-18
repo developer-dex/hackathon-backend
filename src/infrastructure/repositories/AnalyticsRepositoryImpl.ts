@@ -2,22 +2,15 @@ import { IAnalyticsRepository } from '../../domain/interfaces/repositories/Analy
 import { AnalyticsRequestDto, AnalyticsResponseDto, TimePeriod } from '../../dtos/AnalyticsDto';
 import { KudosModel } from '../database/models/KudosModel';
 import { UserModel } from '../database/models/UserModel';
-import { TeamModel } from '../database/models/TeamModel';
 import mongoose from 'mongoose';
 import { AnalyticsMapper } from '../../mappers/AnalyticsMapper';
 
 export class AnalyticsRepositoryImpl implements IAnalyticsRepository {
-  /**
-   * Main method to get all analytics data based on the request parameters
-   */
   async getAnalytics(request: AnalyticsRequestDto): Promise<AnalyticsResponseDto> {
-    // Calculate date ranges based on time period
     const { startDate, endDate, prevStartDate, prevEndDate } = this.calculateDateRange(request);
     
-    // Define limit for top N metrics
     const limit = request.limit || 5;
     
-    // Get all required metrics concurrently
     const [
       topRecognizedIndividuals,
       topTeams,
@@ -36,22 +29,18 @@ export class AnalyticsRepositoryImpl implements IAnalyticsRepository {
       this.topTrendingCategories(startDate, endDate)
     ]);
     
-    // Calculate average kudos per person
     const avgKudosPerPerson = totalUsers > 0 ? +(totalKudos / totalUsers).toFixed(1) : 0;
     
-    // Calculate previous period average
     const prevAvgKudosPerPerson = totalUsers > 0 ? +(prevTotalKudos / totalUsers).toFixed(1) : 0;
     
-    // Calculate percentage changes
     const totalKudosChange = prevTotalKudos === 0 
-      ? 100 // If previous was 0, consider it 100% increase
+      ? 100 
       : +((totalKudos - prevTotalKudos) / prevTotalKudos * 100).toFixed(1);
     
     const avgKudosChange = prevAvgKudosPerPerson === 0 
-      ? 100 // If previous was 0, consider it 100% increase
+      ? 100 
       : +((avgKudosPerPerson - prevAvgKudosPerPerson) / prevAvgKudosPerPerson * 100).toFixed(1);
     
-    // First transform raw data to domain entity
     const analyticsDomain = AnalyticsMapper.toDomain({
       topRecognizedIndividuals,
       topTrendingCategories,
@@ -73,13 +62,9 @@ export class AnalyticsRepositoryImpl implements IAnalyticsRepository {
       periodEnd: endDate.toISOString()
     });
     
-    // Then transform domain entity to DTO
     return AnalyticsMapper.toDTO(analyticsDomain);
   }
 
-  /**
-   * Get total kudos count within a date range
-   */
   async getTotalKudosCount(startDate: Date, endDate: Date, teamId?: string, categoryId?: string): Promise<number> {
     try {
       const query: any = {
@@ -104,14 +89,6 @@ export class AnalyticsRepositoryImpl implements IAnalyticsRepository {
     }
   }
 
-  /** 
-   * Get top trending categories within a date range
-   * Returns the most frequently used kudos categories 
-   * sorted by popularity (count of kudos given)
-   * @param startDate - Start date for the analytics period
-   * @param endDate - End date for the analytics period
-   * @returns Array of trending categories with id, name and count
-   */
   async topTrendingCategories(startDate: Date, endDate: Date): Promise<{id: string, name: string, count: number}[]> {
     try {
       const pipeline = [
@@ -126,7 +103,7 @@ export class AnalyticsRepositoryImpl implements IAnalyticsRepository {
         { $limit: 5 },
         {
           $lookup: {
-            from: 'kudoscategories', // Collection name for KudosCategoryModel
+            from: 'kudoscategories',
             localField: '_id',
             foreignField: '_id',
             as: 'categoryInfo'
@@ -150,9 +127,7 @@ export class AnalyticsRepositoryImpl implements IAnalyticsRepository {
     }
   }
 
-  /**
-   * Get top receivers of kudos within a date range
-   */
+
   async getTopReceivers(startDate: Date, endDate: Date, limit: number, teamId?: string, categoryId?: string): Promise<{id: string, name: string, count: number}[]> {
     try {
       const matchStage: any = {
@@ -206,9 +181,6 @@ export class AnalyticsRepositoryImpl implements IAnalyticsRepository {
     }
   }
 
-  /**
-   * Get top teams by kudos received within a date range
-   */
   async getTopTeams(startDate: Date, endDate: Date, limit: number, categoryId?: string): Promise<{id: string, name: string, count: number}[]> {
     try {
       const matchStage: any = {
@@ -258,9 +230,6 @@ export class AnalyticsRepositoryImpl implements IAnalyticsRepository {
     }
   }
 
-  /**
-   * Get most active day of the week for kudos within a date range
-   */
   async getMostActiveDay(startDate: Date, endDate: Date, teamId?: string, categoryId?: string): Promise<{day: string, count: number, percentage: number}> {
     try {
       const matchStage: any = {
@@ -282,7 +251,7 @@ export class AnalyticsRepositoryImpl implements IAnalyticsRepository {
         { $match: matchStage },
         { 
           $group: {
-            _id: { $dayOfWeek: '$createdAt' }, // 1 for Sunday, 2 for Monday, etc.
+            _id: { $dayOfWeek: '$createdAt' },
             count: { $sum: 1 }
           }
         },
@@ -296,14 +265,11 @@ export class AnalyticsRepositoryImpl implements IAnalyticsRepository {
         return { day: 'N/A', count: 0, percentage: 0 };
       }
 
-      // Get total count for percentage calculation
       const totalCount = await KudosModel.countDocuments(matchStage);
       
-      // Map day number to day name
       const dayMapping = ["", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
       const dayName = dayMapping[result[0]._id];
       
-      // Calculate percentage
       const percentage = totalCount > 0 ? Math.round((result[0].count / totalCount) * 100) : 0;
       
       return {

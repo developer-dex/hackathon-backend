@@ -9,14 +9,12 @@ export class GetTeamById {
 
   async execute(id: string): Promise<ApiResponseDto<TeamDTO>> {
     try {
-      // Get team by ID
       const team = await this.teamRepository.getTeamById(id);
       
       if (!team) {
         return ResponseMapper.notFound('Team');
       }
 
-      // Map to DTO
       const teamDTO = TeamMapper.toDTO(team);
       
       return ResponseMapper.success(

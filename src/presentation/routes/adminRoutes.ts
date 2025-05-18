@@ -25,36 +25,29 @@ const adminController = new AdminController(
 );
 const authMiddleware = new AuthMiddleware(userRepository);
 
-// Route to get all users with optional role filter
-// GET /api/admin/users?role=ADMIN&limit=10&offset=0
+
 router.get('/users', authMiddleware.verifyToken, 
     (req, res) => adminController.getAllUsers(req, res));
 
-// Route to update user verification status
-// PATCH /api/admin/users/:userId/verification-status
+
 router.patch(
   "/users/:userId/verification-status",
-  authMiddleware.requireAdminAndTeamLead,
+  authMiddleware.requireAdmin,
   (req, res) => adminController.updateUserStatus(req, res)
 );
 
-// Toggle user active status
 router.post(
   '/users/toggle-status',
   authMiddleware.requireAdmin,
   (req: Request, res: Response) => adminController.toggleUserActiveStatus(req, res)
 );
 
-// Change user role
-// PATCH /api/admin/users/change-role
 router.patch(
   '/users/change-role',
   authMiddleware.requireAdmin,
   (req: Request, res: Response) => adminController.changeUserRole(req, res)
 );
 
-// Change user team
-// PATCH /api/admin/users/change-team
 router.patch(
   '/users/change-team',
   authMiddleware.requireAdmin,

@@ -1,7 +1,6 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import { EUserRole, VerificationStatus } from '../../../domain/entities/User';
-import { TeamDocument } from './TeamModel';
 import { TeamDTO } from '../../../dtos/TeamDto';
 
 export interface UserDocument extends Document {

@@ -9,21 +9,18 @@ export class CreateKudosCategory {
 
   async execute(dto: CreateKudosCategoryDTO): Promise<ApiResponseDto<KudosCategoryDTO>> {
     try {
-      // Check if category with the same name already exists
       const existingCategory = await this.kudosCategoryRepository.getCategoryByName(dto.name);
       
       if (existingCategory) {
         return ResponseMapper.validationError(`Category with name "${dto.name}" already exists`);
       }
       
-      // Create the new category
       const newCategory = await this.kudosCategoryRepository.createCategory(dto);
       
       if (!newCategory) {
         return ResponseMapper.serverError(new Error('Failed to create category'));
       }
       
-      // Map to DTO
       const categoryDTO = KudosCategoryMapper.toDTO(newCategory);
       
       return ResponseMapper.success(

@@ -8,21 +8,22 @@ export class GetAllKudos {
 
   async execute(
     limit?: number, 
-    offset?: number, 
+    page?: number, 
     filters?: KudosFilters
   ): Promise<ApiResponseDto<KudosListItemDTO[]>> {
     try {
-      const skip = (offset ? offset - 1 : 0) * (limit || 0);
-      // Get all kudos with populated sender, receiver, and category
-      const kudosItems = await this.kudosRepository.getAllKudosPopulated(limit, skip, filters);
+      const kudosItems = await this.kudosRepository.getAllKudosPopulated(limit, page, filters);
       
-      // Count total for pagination
       const total = await this.kudosRepository.getTotalCount(filters);
+      
+      const paginationMeta = (limit !== undefined || page !== undefined) 
+        ? { total, page, limit: limit || kudosItems.length }
+        : undefined;
       
       return ResponseMapper.success(
         kudosItems,
         `Retrieved ${kudosItems.length} kudos successfully`,
-        { total, offset: offset || 0, limit: limit || kudosItems.length }
+        paginationMeta
       );
     } catch (error) {
       return ResponseMapper.serverError(error instanceof Error ? error : new Error('Unknown error'));

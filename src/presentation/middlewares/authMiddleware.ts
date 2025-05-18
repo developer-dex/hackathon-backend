@@ -5,7 +5,6 @@ import { ResponseMapper } from "../../mappers/ResponseMapper";
 import jwt from "jsonwebtoken";
 import { EUserRole } from "../../domain/entities/User";
 
-// Extend the Request interface to include the user property
 export interface AuthenticatedRequest extends Request {
   user?: UserDTO;
 }
@@ -15,7 +14,6 @@ export class AuthMiddleware {
 
   constructor(userRepository: IUserRepository) {
     this.userRepository = userRepository;
-    // Bind methods to ensure 'this' context is preserved
     this.verifyToken = this.verifyToken.bind(this);
     this.requireTeamLead = this.requireTeamLead.bind(this);
     this.requireAdminAndTeamLead = this.requireAdminAndTeamLead.bind(this);

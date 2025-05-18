@@ -31,44 +31,34 @@ const teamController = new TeamController(
   deleteTeamUseCase
 );
 
-// Create auth middleware
 const authMiddleware = new AuthMiddleware(userRepository);
 
-// Define routes
-// GET /api/teams - Get all teams
 teamRouter.get(
   '/',
-//   authMiddleware.verifyToken,
+  authMiddleware.verifyToken,
   (req, res) => teamController.getAllTeams(req, res)
 );
 
-// GET /api/teams/:id - Get team by id
 teamRouter.get(
   '/:id',
   authMiddleware.verifyToken,
   (req, res) => teamController.getTeamById(req, res)
 );
 
-// POST /api/teams - Create a new team
 teamRouter.post(
   '/',
-  authMiddleware.verifyToken,
   authMiddleware.requireTeamLead,
   (req, res) => teamController.createTeam(req, res)
 );
 
-// PUT /api/teams/:id - Update a team
 teamRouter.put(
   '/:id',
-  authMiddleware.verifyToken,
   authMiddleware.requireTeamLead,
   (req, res) => teamController.updateTeam(req, res)
 );
 
-// DELETE /api/teams/:id - Delete a team
 teamRouter.delete(
   '/:id',
-  authMiddleware.verifyToken,
   authMiddleware.requireTeamLead,
   (req, res) => teamController.deleteTeam(req, res)
 ); 

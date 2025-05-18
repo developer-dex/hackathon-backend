@@ -1,5 +1,5 @@
 import { Team } from '../../entities/Team';
-import { CreateTeamDTO, TeamDTO } from '../../../dtos/TeamDto';
+import { CreateTeamDTO } from '../../../dtos/TeamDto';
 
 export interface ITeamRepository {
   createTeam(teamData: CreateTeamDTO): Promise<Team | null>;

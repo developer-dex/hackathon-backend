@@ -208,20 +208,20 @@ The Admin API provides endpoints for administrative functions such as managing u
 
 #### Get All Users
 
-Retrieve a list of all users with optional filtering by role.
+Retrieve a list of all users with optional filtering by role and pagination.
 
 ```bash
 curl -X GET \
-  'http://localhost:3000/api/admin/users?role=TEAM_MEMBER&limit=10&offset=0' \
+  'http://localhost:3000/api/admin/users?role=TEAM_MEMBER&limit=10&offset=1' \
   -H 'Authorization: Bearer YOUR_JWT_TOKEN'
 ```
 
 **Parameters:**
 - `role` (optional): Filter users by role (ADMIN, TEAM_LEAD, TEAM_MEMBER)
-- `limit` (optional): Number of users to return (pagination)
-- `offset` (optional): Starting position for pagination (default: 0)
+- `limit` (optional): Number of users to return per page
+- `offset` (optional): Page number for pagination (starting from 1)
 
-**Response:**
+**Response with Pagination:**
 ```json
 {
   "success": true,
@@ -234,14 +234,6 @@ curl -X GET \
         "role": "TEAM_MEMBER",
         "verificationStatus": "VERIFIED",
         "createdAt": "2023-10-29T12:34:56.789Z"
-      },
-      {
-        "id": "65f123456789abcdef123457",
-        "name": "Jane Smith",
-        "email": "jane@example.com",
-        "role": "TEAM_LEAD",
-        "verificationStatus": "VERIFIED",
-        "createdAt": "2023-10-29T14:23:45.678Z"
       }
     ]
   },
@@ -249,15 +241,35 @@ curl -X GET \
   "pagination": {
     "total": 50,
     "limit": 10,
-    "offset": 0
+    "page": 1
   }
+}
+```
+
+**Response without Pagination:**
+```json
+{
+  "success": true,
+  "data": {
+    "users": [
+      {
+        "id": "65f123456789abcdef123456",
+        "name": "John Doe",
+        "email": "john@example.com",
+        "role": "TEAM_MEMBER",
+        "verificationStatus": "VERIFIED",
+        "createdAt": "2023-10-29T12:34:56.789Z"
+      }
+    ]
+  },
+  "message": "Users retrieved successfully"
 }
 ```
 
 **Access Control:**
 - This endpoint requires admin privileges
 - The user must be authenticated with a valid JWT token
-- The user's role must be ADMIN 
+- The user's role must be ADMIN
 
 #### Update User Verification Status
 
@@ -383,3 +395,41 @@ curl -X PATCH http://localhost:3000/api/admin/users/change-role \
 ```
 
 Note: The `role` field must be one of: "Admin", "Team Lead", or "Team Member"
+
+### Basecamp Integration
+
+The Kudos application now integrates with Basecamp to send real-time notifications when kudos are created. When a team lead gives kudos to a team member, a message is automatically posted to the configured Basecamp project.
+
+#### Configuration
+
+To configure the Basecamp integration, set the following environment variable:
+
+```
+BASECAMP_WEBHOOK_URL=your_basecamp_webhook_url
+```
+
+If not specified, the system will use a default webhook URL.
+
+#### Notification Format
+
+The Basecamp notification includes:
+- Sender name (Team Lead who created the kudos)
+- Receiver name (Team Member who received the kudos)
+- Team name
+- Category name
+- Kudos message
+
+Example of a Basecamp notification:
+```
+👏 Appreciation to Team
+
+From: 👨‍💼 John Smith
+To: 👨‍💼 Jane Doe
+Team: 🏢 Engineering
+Category: 🏆 Achievement
+
+Message:
+Your exceptional work on authentication testing showcases outstanding attention to detail and a strong commitment to quality.
+
+🚀 Onward and upward!
+```

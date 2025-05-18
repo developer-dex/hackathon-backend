@@ -8,5 +8,4 @@ export interface IKudosCategoryRepository {
   getAllCategories(): Promise<KudosCategory[]>;
   updateCategory(id: string, categoryData: UpdateKudosCategoryDTO): Promise<KudosCategory | null>;
   deleteCategory(id: string): Promise<boolean>;
-  initializeDefaultCategories(): Promise<void>;
 } 

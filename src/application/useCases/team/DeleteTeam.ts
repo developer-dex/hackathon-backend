@@ -7,14 +7,12 @@ export class DeleteTeam {
 
   async execute(id: string): Promise<ApiResponseDto<boolean>> {
     try {
-      // Check if team exists
       const existingTeam = await this.teamRepository.getTeamById(id);
       
       if (!existingTeam) {
         return ResponseMapper.notFound('Team');
       }
 
-      // Delete the team
       const deleted = await this.teamRepository.deleteTeam(id);
       
       if (!deleted) {

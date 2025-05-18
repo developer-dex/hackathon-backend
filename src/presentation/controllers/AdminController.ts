@@ -24,38 +24,42 @@ export class AdminController {
   async getAllUsers(req: Request, res: Response): Promise<void> {
     try {
       const { role } = req.query;
-      const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 0;
-      const skip = req.query.offset ? parseInt(req.query.offset as string, 10) : 0;
+      const limit = req.query.limit ? Number(req.query.limit) : undefined;
+      const page = req.query.offset ? Number(req.query.offset) : undefined;
 
-      console.log("-==-=-=-=-==",limit, skip);
-
-      const { size, offset } = pagination(limit, skip);
-
-      console.log("-==-=-=-=-==",offset, size);
-      
       const roleFilter = role ? String(role) : undefined;
       
       const { users, totalCount } = await this.getAllUsersUseCase.execute(
         roleFilter,
         limit,
-        offset
+        page
       );
       
       const userDTOs = AdminMapper.toUserListItemDTOList(users);
       
-      const paginationMeta = {
-        total: totalCount,
-        offset,
-        limit: limit || totalCount // Default to total count if limit is undefined
-      };
+      // Create the response with or without pagination
+      let response;
       
-      const response = ResponseMapper.success(
-        {
-          users: userDTOs
-        },
-        'Users retrieved successfully',
-        paginationMeta
-      );
+      // Only include pagination if either limit or page is provided
+      if (limit !== undefined || page !== undefined) {
+        const paginationMeta = {
+          total: totalCount,
+          page,
+          limit
+        };
+        
+        response = ResponseMapper.success(
+          { users: userDTOs },
+          'Users retrieved successfully',
+          paginationMeta
+        );
+      } else {
+        // Without pagination
+        response = ResponseMapper.success(
+          { users: userDTOs },
+          'Users retrieved successfully'
+        );
+      }
       
       res.status(200).json(response);
     } catch (error) {

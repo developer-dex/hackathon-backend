@@ -31,74 +31,39 @@ export class ForgotPassword {
     this.updatedAt = updatedAt;
   }
 
-  /**
-   * Get the ID
-   * @returns The ID
-   */
+
   getId(): string {
     return this.id;
   }
 
-  /**
-   * Get the user ID
-   * @returns The user ID
-   */
   getUserId(): string {
     return this.userId;
   }
 
-  /**
-   * Get the email
-   * @returns The email
-   */
   getEmail(): string {
     return this.email;
   }
 
-  /**
-   * Get the token
-   * @returns The token
-   */
   getToken(): string {
     return this.token;
   }
 
-  /**
-   * Get the expiration date
-   * @returns The expiration date
-   */
   getExpiresAt(): Date {
     return this.expiresAt;
   }
 
-  /**
-   * Check if the token is used
-   * @returns True if the token is used, false otherwise
-   */
   getIsUsed(): boolean {
     return this.isUsed;
   }
 
-  /**
-   * Get the creation date
-   * @returns The creation date
-   */
   getCreatedAt(): Date {
     return this.createdAt;
   }
 
-  /**
-   * Get the update date
-   * @returns The update date
-   */
   getUpdatedAt(): Date {
     return this.updatedAt;
   }
 
-  /**
-   * Check if the token is expired
-   * @returns True if the token is expired, false otherwise
-   */
   isExpired(): boolean {
     return new Date() > this.expiresAt;
   }
