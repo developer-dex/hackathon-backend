@@ -24,15 +24,11 @@ export class ToggleUserActiveStatus {
     try {
       const { userId, isActive } = requestDto;
 
-      console.log(userId, isActive);
-      // Check if user exists
       const user = await this.userRepository.findById(userId);
-      console.log(user);
       if (!user) {
         return ResponseMapper.notFound("User not found");
       }
 
-      // If user is already in the desired state, return success without making changes
       if (user.isActive() === isActive) {
         const message = isActive
           ? "User is already active"
@@ -48,7 +44,6 @@ export class ToggleUserActiveStatus {
         );
       }
 
-      // Toggle user's active status
       const updatedUser = await this.userRepository.toggleUserActiveStatus(userId, isActive);
       
       if (!updatedUser) {
@@ -57,12 +52,10 @@ export class ToggleUserActiveStatus {
         );
       }
 
-      // Create success message
       const message = isActive
         ? "User activated successfully"
         : "User deactivated successfully";
 
-      // Convert to DTO and return success response
       return ResponseMapper.success(
         {
           success: true,

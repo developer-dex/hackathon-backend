@@ -19,12 +19,9 @@ export class ForgotPassword {
     try {
       const { email } = requestDto;
 
-      // Find user by email
-      const user = await this.userRepository.findByEmail(email);
+      const userExist = await this.userRepository.findByEmail(email);
       
-      // If user not found, still return success for security reasons
-      // but don't actually create a token
-      if (!user) {
+      if (!userExist) {
         return ResponseMapper.success(
           { 
             success: true,
@@ -34,13 +31,11 @@ export class ForgotPassword {
         );
       }
 
-      // Clean up expired tokens first
-      await this.forgotPasswordRepository.deleteExpiredTokens();
+      await this.forgotPasswordRepository.deleteExpiredTokens(userExist.getId());
 
-      // Create password reset token
       const resetToken = await this.forgotPasswordRepository.createPasswordResetToken(
         email,
-        user.getId()
+        userExist.getId()
       );
 
       if (!resetToken) {
@@ -49,13 +44,10 @@ export class ForgotPassword {
         );
       }
 
-      // Generate reset link
       const resetLink = `${config.frontendBaseUrl}${config.resetPasswordPath}?token=${resetToken.getToken()}`;
 
-      // Send the password reset email
       await this.emailService.sendResetPasswordEmail(email, resetLink);
 
-      // In development, also return the reset link
       const isDevelopment = process.env.NODE_ENV !== "production";
 
       return ResponseMapper.success(

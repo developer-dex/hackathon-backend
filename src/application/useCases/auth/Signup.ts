@@ -13,34 +13,28 @@ export class Signup {
 
   async execute(dto: SignupRequestDto): Promise<ApiResponseDto<SignupResponseDto>> {
     try {
-      // Check if passwords match
       if (dto.password !== dto.confirmPassword) {
         return ResponseMapper.validationError('Passwords do not match');
       }
 
-      // Check if email already exists
       const existingUser = await this.userRepository.findByEmail(dto.email);
       if (existingUser) {
         return ResponseMapper.validationError('Email is already registered');
       }
 
-      // Check if team exists
       const team = await this.teamRepository.getTeamById(dto.teamId);
       if (!team) {
         return ResponseMapper.validationError('Selected team does not exist');
       }
 
-      // Create user
       const newUser = await this.userRepository.createUser(dto);
       
       if (!newUser) {
         return ResponseMapper.serverError(new Error('Failed to create user'));
       }
 
-      // Map to DTO without sensitive data
       const userDTO = UserMapper.toDTO(newUser);
       
-      // Create response with team info
       const signupResponse: SignupResponseDto = {
         ...userDTO,
         team: {

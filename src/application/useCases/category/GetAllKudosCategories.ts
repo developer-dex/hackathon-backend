@@ -9,10 +9,8 @@ export class GetAllKudosCategories {
 
   async execute(): Promise<ApiResponseDto<KudosCategoryDTO[]>> {
     try {
-      // Get all categories
       const retriveCategories = await this.kudosCategoryRepository.getAllCategories();
       
-      // Map to DTOs
       const categories = retriveCategories.map(category => KudosCategoryMapper.toDTO(category));
       
       return ResponseMapper.success(

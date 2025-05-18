@@ -10,7 +10,7 @@ export interface IUserRepository {
   verifyPassword(providedPassword: string, storedPassword: string): Promise<boolean>;
   generateToken(user: UserDTO): string;
   verifyToken(token: string): Promise<UserDTO | null>;
-  getAllUsers(role?: string, limit?: number, offset?: number): Promise<User[]>;
+  getAllUsers(role?: string, limit?: number, page?: number): Promise<User[]>;
   getTotalUsersCount(role?: string): Promise<number>;
   updateVerificationStatus(userId: string, status: VerificationStatus): Promise<User | null>;
   updateUser(userId: string, userData: UserDTO): Promise<User | null>;

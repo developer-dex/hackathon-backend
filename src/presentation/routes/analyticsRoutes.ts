@@ -7,17 +7,13 @@ import { UserRepositoryImpl } from '../../infrastructure/repositories/UserReposi
 
 export const analyticsRouter = Router();
 
-// Initialize dependencies
 const analyticsRepository = new AnalyticsRepositoryImpl();
 const getAnalyticsUseCase = new GetAnalytics(analyticsRepository);
 const analyticsController = new AnalyticsController(getAnalyticsUseCase);
 
-// Create auth middleware
 const userRepository = new UserRepositoryImpl();
 const authMiddleware = new AuthMiddleware(userRepository);
 
-// Define routes
-// GET /api/analytics - Get analytics data
 analyticsRouter.get(
   '/',
   authMiddleware.verifyToken,

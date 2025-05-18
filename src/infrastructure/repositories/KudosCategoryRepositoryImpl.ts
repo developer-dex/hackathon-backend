@@ -1,13 +1,12 @@
 import { IKudosCategoryRepository } from '../../domain/interfaces/repositories/KudosCategoryRepository';
 import { KudosCategory } from '../../domain/entities/KudosCategory';
 import { CreateKudosCategoryDTO, UpdateKudosCategoryDTO } from '../../dtos/KudosCategoryDto';
-import { KudosCategoryModel, seedDefaultCategories } from '../database/models/KudosCategoryModel';
+import { KudosCategoryModel } from '../database/models/KudosCategoryModel';
 import { KudosCategoryMapper } from '../../mappers/KudosCategoryMapper';
 
 export class KudosCategoryRepositoryImpl implements IKudosCategoryRepository {
   async createCategory(categoryData: CreateKudosCategoryDTO): Promise<KudosCategory | null> {
     try {
-      // Convert name to uppercase for consistency
       const formattedData = {
         ...categoryData,
         name: categoryData.name.toUpperCase()
@@ -58,7 +57,6 @@ export class KudosCategoryRepositoryImpl implements IKudosCategoryRepository {
 
   async updateCategory(id: string, categoryData: UpdateKudosCategoryDTO): Promise<KudosCategory | null> {
     try {
-      // If name is provided, convert to uppercase
       const formattedData = { ...categoryData };
       if (formattedData.name) {
         formattedData.name = formattedData.name.toUpperCase();
@@ -84,14 +82,6 @@ export class KudosCategoryRepositoryImpl implements IKudosCategoryRepository {
     } catch (error) {
       console.error('Error deleting category:', error);
       return false;
-    }
-  }
-
-  async initializeDefaultCategories(): Promise<void> {
-    try {
-      await seedDefaultCategories();
-    } catch (error) {
-      console.error('Error initializing default categories:', error);
     }
   }
 } 

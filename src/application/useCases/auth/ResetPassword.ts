@@ -17,41 +17,33 @@ export class ResetPassword {
     try {
       const { token, newPassword } = requestDto;
 
-      // Find the token in the database
       const resetToken = await this.forgotPasswordRepository.findByToken(token);
 
-      // Handle invalid or expired token
       if (!resetToken) {
         return ResponseMapper.badRequest("Invalid or expired password reset token");
       }
 
-      // Check if token is expired
       const now = new Date();
       if (resetToken.getExpiresAt() < now) {
         return ResponseMapper.badRequest("Password reset token has expired");
       }
 
-      // Check if token has been used
       if (resetToken.getIsUsed()) {
         return ResponseMapper.badRequest("Password reset token has already been used");
       }
 
-      // Find the user associated with the token
       const user = await this.userRepository.findByIdWithoutDeleteUser(resetToken.getUserId());
       if (!user) {
         return ResponseMapper.badRequest("User not found");
       }
 
-      // Update the user's password
       const updatedUser = await this.userRepository.updatePassword(user.getId(), newPassword);
       if (!updatedUser) {
         return ResponseMapper.serverError(new Error("Failed to update user password"));
       }
 
-      // Mark the token as used
       await this.forgotPasswordRepository.markAsUsed(token);
 
-      // Return success response
       return ResponseMapper.success(
         {
           success: true,

@@ -25,31 +25,27 @@ export class ChangeUserTeam {
     try {
       const { userId, teamId } = requestDto;
 
-      // Validate MongoDB ObjectId format
       if (!mongoose.Types.ObjectId.isValid(teamId)) {
         return ResponseMapper.badRequest(`Invalid teamId format: ${teamId}`);
       }
 
-      // Check if user exists
-      const user = await this.userRepository.findById(userId);
-      if (!user) {
+      const userExist = await this.userRepository.findById(userId);
+      if (!userExist) {
         return ResponseMapper.notFound("User not found");
       }
 
-      // If the user already has the specified team, return early
-      if (user.getTeamId()?.toString() === teamId) {
+      if (userExist.getTeamId()?.toString() === teamId) {
         return ResponseMapper.success(
           {
             success: true,
-            user: UserMapper.toDTO(user),
+            user: UserMapper.toDTO(userExist),
             message: `User already belongs to this team`
           },
           `User already belongs to this team`
         );
       }
 
-      // Update the user's team
-      const userDto = UserMapper.toDTO(user);
+      const userDto = UserMapper.toDTO(userExist);
       const updatedData = {
         ...userDto,
         teamId
@@ -63,7 +59,6 @@ export class ChangeUserTeam {
         );
       }
 
-      // Return success response
       return ResponseMapper.success(
         {
           success: true,

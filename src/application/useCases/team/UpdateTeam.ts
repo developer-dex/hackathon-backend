@@ -9,21 +9,18 @@ export class UpdateTeam {
 
   async execute(id: string, dto: Partial<CreateTeamDTO>): Promise<ApiResponseDto<TeamDTO>> {
     try {
-      // Check if team exists
       const existingTeam = await this.teamRepository.getTeamById(id);
       
       if (!existingTeam) {
         return ResponseMapper.notFound('Team');
       }
 
-      // Update the team
       const updatedTeam = await this.teamRepository.updateTeam(id, dto);
       
       if (!updatedTeam) {
         return ResponseMapper.serverError(new Error('Failed to update team'));
       }
 
-      // Map to DTO
       const teamDTO = TeamMapper.toDTO(updatedTeam);
       
       return ResponseMapper.success(

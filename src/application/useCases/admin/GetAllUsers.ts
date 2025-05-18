@@ -4,14 +4,12 @@ import { User } from "../../../domain/entities/User";
 export class GetAllUsers {
   constructor(private userRepository: IUserRepository) {}
 
-  async execute(role?: string, limit?: number, offset: number = 0): Promise<{
+  async execute(role?: string, limit?: number, page?: number): Promise<{
     users: User[];
     totalCount: number;
   }> {
     try {
-      // Use database-level pagination by passing limit and offset directly to repository
-      const skip = (offset ? offset - 1 : 0) * (limit || 0);
-      const users = await this.userRepository.getAllUsers(role, limit, skip);
+      const users = await this.userRepository.getAllUsers(role, limit, page);
       const totalCount = await this.userRepository.getTotalUsersCount(role);
 
       return {

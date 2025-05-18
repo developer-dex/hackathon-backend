@@ -52,48 +52,6 @@ const kudosCategorySchema = new Schema(
   }
 );
 
-// Add text index for searching categories
 kudosCategorySchema.index({ name: 'text', description: 'text' });
 
 export const KudosCategoryModel = mongoose.model<KudosCategoryDocument>('KudosCategory', kudosCategorySchema);
-
-// Seed default categories if none exist
-export const seedDefaultCategories = async (): Promise<void> => {
-  const count = await KudosCategoryModel.countDocuments();
-  if (count === 0) {
-    const defaultCategories = [
-      {
-        name: 'TEAMWORK',
-        description: 'Recognition for excellent collaboration and team spirit',
-        icon: 'users',
-        color: '#3498db'
-      },
-      {
-        name: 'INNOVATION',
-        description: 'Recognition for creative solutions and innovative thinking',
-        icon: 'lightbulb',
-        color: '#9b59b6'
-      },
-      {
-        name: 'EXCELLENCE',
-        description: 'Recognition for outstanding performance and quality work',
-        icon: 'star',
-        color: '#f1c40f'
-      },
-      {
-        name: 'LEADERSHIP',
-        description: 'Recognition for guiding others and leading by example',
-        icon: 'trophy',
-        color: '#e74c3c'
-      },
-      {
-        name: 'HELPFULNESS',
-        description: 'Recognition for providing support and assistance to others',
-        icon: 'hands-helping',
-        color: '#2ecc71'
-      }
-    ];
-
-    await KudosCategoryModel.insertMany(defaultCategories);
-  }
-}; 

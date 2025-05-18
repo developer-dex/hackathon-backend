@@ -1,9 +1,7 @@
 import nodemailer from "nodemailer";
 import { config } from "../../config/config";
 
-/**
- * Email service for sending emails
- */
+
 export class EmailService {
   private transporter: nodemailer.Transporter;
   
@@ -59,6 +57,20 @@ export class EmailService {
       <p><a href="${resetLink}">Reset Password</a></p>
       <p>If you didn't request this, please ignore this email.</p>
       <p>This link will expire in 20 minutes.</p>
+      <p>Best regards,</p>
+      <p>The Kudos Team</p>
+    `;
+    
+    return this.sendMail(to, subject, htmlContent);
+  }
+
+  // Send kudos email
+  async sendKudosEmail(to: string, sender: string, receiver: string, team: string, category: string, message: string): Promise<boolean> {
+    const subject = "Kudos Received";
+    const htmlContent = `
+      <h1>Kudos Received</h1>
+      <p>You have received a kudos from ${sender} in ${team} for ${category}.</p>
+      <p>Message: ${message}</p>
       <p>Best regards,</p>
       <p>The Kudos Team</p>
     `;

@@ -7,19 +7,15 @@ import path from 'path';
 import router from './presentation/routes/index';
 import { config } from './config/config';
 
-// Create Express app
 const app = express();
 
-// Middleware
 app.use(helmet());
 app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
 
-// Serve static files
 app.use(express.static(path.join(process.cwd(), 'public')));
 
-// Connect to MongoDB
 mongoose
   .connect(config.databaseURL || '')
   .then(() => {
@@ -30,15 +26,12 @@ mongoose
     process.exit(1);
   });
 
-// API routes
 app.use('/api', router);
 
-// Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', message: 'Server is running' });
 });
 
-// Handle undefined routes
 app.use('*', (req, res) => {
   res.status(404).json({
     success: false,
@@ -47,7 +40,6 @@ app.use('*', (req, res) => {
   });
 });
 
-// Error handling middleware
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error('Unhandled error:', err);
   res.status(500).json({
@@ -57,7 +49,6 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
   });
 });
 
-// Start server
 const PORT = config.port || 8000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

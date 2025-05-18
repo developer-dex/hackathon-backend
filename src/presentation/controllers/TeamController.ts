@@ -19,7 +19,6 @@ export class TeamController {
 
   async createTeam(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
-      // Validate request data
       const { error, value } = validateTeamRequest(req.body);
       
       if (error) {
@@ -28,7 +27,6 @@ export class TeamController {
         return;
       }
       
-      // Execute use case
       const result = await this.createTeamUseCase.execute(value);
       
       if (result.success) {
@@ -43,7 +41,6 @@ export class TeamController {
 
   async getAllTeams(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
-      // Execute use case
       const result = await this.getAllTeamsUseCase.execute();
       
       if (result.success) {
@@ -59,8 +56,6 @@ export class TeamController {
   async getTeamById(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const id = req.params.id;
-      
-      // Execute use case
       const result = await this.getTeamByIdUseCase.execute(id);
       
       if (result.success) {
@@ -79,7 +74,6 @@ export class TeamController {
     try {
       const id = req.params.id;
       
-      // If name is provided, validate it
       if (req.body.name) {
         const { error } = validateTeamRequest(req.body);
         
@@ -90,7 +84,6 @@ export class TeamController {
         }
       }
       
-      // Execute use case
       const result = await this.updateTeamUseCase.execute(id, req.body);
       
       if (result.success) {
@@ -108,8 +101,6 @@ export class TeamController {
   async deleteTeam(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const id = req.params.id;
-      
-      // Execute use case
       const result = await this.deleteTeamUseCase.execute(id);
       
       if (result.success) {

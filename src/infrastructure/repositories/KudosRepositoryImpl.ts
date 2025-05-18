@@ -3,10 +3,8 @@ import { Kudos } from '../../domain/entities/Kudos';
 import { CreateKudosDTO, KudosDTO, KudosListItemDTO } from '../../dtos/KudosDto';
 import { KudosModel } from '../database/models/KudosModel';
 import { KudosMapper } from '../../mappers/KudosMapper';
-import { UserModel } from '../database/models/UserModel';
-import { KudosCategoryModel } from '../database/models/KudosCategoryModel';
-import { TeamModel } from '../database/models/TeamModel';
 import mongoose from 'mongoose';
+import { pagination } from '../../shared/utils/utils';
 
 export class KudosRepositoryImpl implements IKudosRepository {
   async createKudos(kudosData: CreateKudosDTO): Promise<Kudos | null> {
@@ -100,20 +98,28 @@ export class KudosRepositoryImpl implements IKudosRepository {
     }
   }
 
-  async getAllKudosPopulated(limit?: number, offset: number = 0, filters?: KudosFilters): Promise<KudosListItemDTO[]> {
+  async getAllKudosPopulated(limit?: number, page?: number, filters?: KudosFilters): Promise<KudosListItemDTO[]> {
     try {
+      const { size, offset } = pagination(limit, page);
       const query = this.buildQueryFilters(filters);
       
-      const kudos = await KudosModel.find(query)
+      let dbQuery = KudosModel.find(query)
         .sort({ createdAt: -1 })
         .populate('senderId')
         .populate('receiverId')
         .populate('categoryId')
-        .populate('teamId')
-        .skip(offset)
-        .limit(limit ? limit : 0)
-        .lean()
-        .exec();
+        .populate('teamId');
+      
+      // Apply pagination only if parameters are provided
+      if (offset !== undefined) {
+        dbQuery = dbQuery.skip(offset);
+      }
+      
+      if (size !== undefined) {
+        dbQuery = dbQuery.limit(size);
+      }
+      
+      const kudos = await dbQuery.lean().exec();
       
       const result: KudosListItemDTO[] = [];
 

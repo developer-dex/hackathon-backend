@@ -8,6 +8,7 @@ import { SignupRequestDto } from '../../dtos/AuthDto';
 import { IUserRepository } from '../../domain/interfaces/repositories/UserRepository';
 import dotenv from 'dotenv';
 import mongoose, { Mongoose } from 'mongoose';
+import { pagination } from '../../shared/utils/utils';
 
 dotenv.config();
 
@@ -120,21 +121,37 @@ export class UserRepositoryImpl implements IUserRepository {
     }
   }
 
-  async getAllUsers(role?: string, limit?: number, offset: number = 0): Promise<User[]> {
+  async getAllUsers(role?: string, limit?: number, page?: number): Promise<User[]> {
     try {
-      const query = role ? { role } : {};
+      // Build query to filter by role and exclude deleted users
+      const query = { 
+        ...(role ? { role } : {}),
+        deletedAt: null 
+      };
+      console.log("limit", limit);
+      console.log("page", page);
+      // Calculate pagination using the utility function
+      const { size, offset } = pagination(limit, page);
+      console.log("size", size);
+      console.log("offset", offset);
       
+      // Build the base query
       let dbQuery = UserModel.find(query).populate('teamId');
-      dbQuery = dbQuery.sort({ createdAt: -1 })
-        .skip(offset);
+      dbQuery = dbQuery.sort({ createdAt: -1 });
 
-      if (limit) {
-        dbQuery = dbQuery.limit(limit);
+      // Apply pagination if parameters are provided
+      if (offset !== undefined) {
+        dbQuery = dbQuery.skip(offset);
+      }
+
+      if (size !== undefined) {
+        dbQuery = dbQuery.limit(size);
       }
       
+      // Execute the query
       const users = await dbQuery.exec();
-      console.log(users[0]);
       
+      // Map database models to domain entities
       return users
         .map(user => UserMapper.toDomain(user))
         .filter((user): user is User => user !== null);
@@ -146,7 +163,10 @@ export class UserRepositoryImpl implements IUserRepository {
 
   async getTotalUsersCount(role?: string): Promise<number> {
     try {
-      const query = role ? { role } : {};
+      const query = { 
+        ...(role ? { role } : {}),
+        deletedAt: null 
+      };
       return await UserModel.countDocuments(query);
     } catch (error) {
       console.error('Error getting total users count:', error);

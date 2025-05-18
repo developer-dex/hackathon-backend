@@ -44,10 +44,8 @@ const kudosSchema = new Schema(
     timestamps: true
   }
 );
-
-// Add index for efficient querying of kudos by sender and receiver
 kudosSchema.index({ senderId: 1, receiverId: 1 });
-kudosSchema.index({ categoryId: 1 }); // Index for category queries
-kudosSchema.index({ teamId: 1 }); // Index for team queries
+kudosSchema.index({ categoryId: 1 });
+kudosSchema.index({ teamId: 1 });
 
 export const KudosModel = mongoose.model<KudosDocument>('Kudos', kudosSchema); 

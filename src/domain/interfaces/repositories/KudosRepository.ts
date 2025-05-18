@@ -17,6 +17,6 @@ export interface IKudosRepository {
   getKudosBySender(senderId: string): Promise<Kudos[]>;
   getKudosByReceiver(receiverId: string): Promise<Kudos[]>;
   getAllKudos(limit?: number, offset?: number, filters?: KudosFilters): Promise<Kudos[]>;
-  getAllKudosPopulated(limit?: number, offset?: number, filters?: KudosFilters): Promise<KudosListItemDTO[]>;
+  getAllKudosPopulated(limit?: number, page?: number, filters?: KudosFilters): Promise<KudosListItemDTO[]>;
   getTotalCount(filters?: KudosFilters): Promise<number>;
 } 

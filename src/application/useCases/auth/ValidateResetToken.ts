@@ -12,10 +12,8 @@ export class ValidateResetToken {
     try {
       const { token } = requestDto;
 
-      // Find the token in the database
       const resetToken = await this.forgotPasswordRepository.findByToken(token);
 
-      // If token doesn't exist
       if (!resetToken) {
         return ResponseMapper.success(
           {
@@ -26,7 +24,6 @@ export class ValidateResetToken {
         );
       }
 
-      // Check if token is expired
       const now = new Date();
       if (resetToken.getExpiresAt() < now) {
         return ResponseMapper.success(
@@ -38,7 +35,6 @@ export class ValidateResetToken {
         );
       }
 
-      // Check if token has been used
       if (resetToken.getIsUsed()) {
         return ResponseMapper.success(
           {
@@ -49,7 +45,6 @@ export class ValidateResetToken {
         );
       }
 
-      // Token is valid
       return ResponseMapper.success(
         {
           isValid: true,

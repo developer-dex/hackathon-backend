@@ -9,10 +9,8 @@ export class GetAllTeams {
 
   async execute(): Promise<ApiResponseDto<TeamDTO[]>> {
     try {
-      // Get all teams
       const teams = await this.teamRepository.getAllTeams();
       
-      // Map to DTOs
       const teamDTOs = teams.map(team => TeamMapper.toDTO(team));
       
       return ResponseMapper.success(
