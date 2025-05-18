@@ -72,7 +72,7 @@ export class CreateKudos {
           }
         }
 
-        if (process.env.NODE_ENV === "production") {
+        if (process.env.NODE_ENV === "development") {
           this.basecampService.sendKudosMessage({
             sender: currentUser.name,
             receiver: receiver.getName(),
