@@ -1,18 +1,35 @@
 import { Login } from '../../../../../src/application/useCases/auth/Login';
-import { IUserRepository } from '../../../../../src/domain/interfaces/repositories/IUserRepository';
+import { IUserRepository } from '../../../../../src/domain/interfaces/repositories/UserRepository';
 import { User, VerificationStatus, EUserRole } from '../../../../../src/domain/entities/User';
 import { LoginRequestDto, UserDTO } from '../../../../../src/dtos/AuthDto';
 import { ResponseMapper } from '../../../../../src/mappers/ResponseMapper';
 import { UserMapper } from '../../../../../src/mappers/UserMapper';
+import { TeamDTO } from '../../../../../src/dtos/TeamDto';
+
+// Mock team data
+const mockTeam: TeamDTO & { toString: () => string } = {
+  id: '456',
+  name: 'Test Team',
+  createdAt: '2023-01-01T00:00:00.000Z',
+  updatedAt: '2023-01-01T00:00:00.000Z',
+  toString: function() { return this.id; }
+};
 
 // Mock dependencies
 const mockUserRepository: jest.Mocked<IUserRepository> = {
   findByEmail: jest.fn(),
   findById: jest.fn(),
+  findByIdWithoutDeleteUser: jest.fn(),
   createUser: jest.fn(),
   verifyPassword: jest.fn(),
   generateToken: jest.fn(),
-  verifyToken: jest.fn()
+  verifyToken: jest.fn(),
+  getAllUsers: jest.fn(),
+  getTotalUsersCount: jest.fn(),
+  updateVerificationStatus: jest.fn(),
+  updateUser: jest.fn(),
+  updatePassword: jest.fn(),
+  toggleUserActiveStatus: jest.fn()
 };
 
 // Mock user properties for User.create
@@ -22,7 +39,7 @@ const mockUserProps = {
   email: 'test@example.com',
   password: 'hashedPassword',
   role: EUserRole.TEAM_MEMBER,
-  teamId: '456',
+  teamId: mockTeam,
   verificationStatus: VerificationStatus.VERIFIED,
   createdAt: '2023-01-01T00:00:00.000Z',
   updatedAt: '2023-01-01T00:00:00.000Z'
@@ -37,7 +54,7 @@ const mockUserDTO: UserDTO = {
   name: 'Test User',
   email: 'test@example.com',
   role: EUserRole.TEAM_MEMBER,
-  teamId: '456',
+  teamId: mockTeam.id,
   verificationStatus: VerificationStatus.VERIFIED,
   createdAt: '2023-01-01T00:00:00.000Z',
   updatedAt: '2023-01-01T00:00:00.000Z'

@@ -1,20 +1,28 @@
 import { Signup } from '../../../../../src/application/useCases/auth/Signup';
-import { IUserRepository } from '../../../../../src/domain/interfaces/repositories/IUserRepository';
+import { IUserRepository } from '../../../../../src/domain/interfaces/repositories/UserRepository';
 import { ITeamRepository } from '../../../../../src/domain/interfaces/repositories/TeamRepository';
 import { User, VerificationStatus, EUserRole } from '../../../../../src/domain/entities/User';
 import { Team } from '../../../../../src/domain/entities/Team';
 import { SignupRequestDto, UserDTO } from '../../../../../src/dtos/AuthDto';
 import { ResponseMapper } from '../../../../../src/mappers/ResponseMapper';
 import { UserMapper } from '../../../../../src/mappers/UserMapper';
+import { TeamDTO } from '../../../../../src/dtos/TeamDto';
 
 // Mock dependencies
 const mockUserRepository: jest.Mocked<IUserRepository> = {
   findByEmail: jest.fn(),
   findById: jest.fn(),
+  findByIdWithoutDeleteUser: jest.fn(),
   createUser: jest.fn(),
   verifyPassword: jest.fn(),
   generateToken: jest.fn(),
-  verifyToken: jest.fn()
+  verifyToken: jest.fn(),
+  getAllUsers: jest.fn(),
+  getTotalUsersCount: jest.fn(),
+  updateVerificationStatus: jest.fn(),
+  updateUser: jest.fn(),
+  updatePassword: jest.fn(),
+  toggleUserActiveStatus: jest.fn()
 };
 
 const mockTeamRepository: jest.Mocked<ITeamRepository> = {
@@ -26,14 +34,15 @@ const mockTeamRepository: jest.Mocked<ITeamRepository> = {
 };
 
 // Mock team data
-const mockTeamProps = {
+const mockTeamDTO: TeamDTO & { toString: () => string } = {
   id: '456',
   name: 'Test Team',
   createdAt: '2023-01-01T00:00:00.000Z',
-  updatedAt: '2023-01-01T00:00:00.000Z'
+  updatedAt: '2023-01-01T00:00:00.000Z',
+  toString: function() { return this.id; }
 };
 
-const mockTeam = Team.create(mockTeamProps);
+const mockTeam = Team.create(mockTeamDTO);
 
 // Mock user props for User.create
 const mockUserProps = {
@@ -42,7 +51,7 @@ const mockUserProps = {
   email: 'test@example.com',
   password: 'hashedPassword',
   role: EUserRole.TEAM_MEMBER,
-  teamId: '456',
+  teamId: mockTeamDTO,
   verificationStatus: VerificationStatus.PENDING,
   createdAt: '2023-01-01T00:00:00.000Z',
   updatedAt: '2023-01-01T00:00:00.000Z'
@@ -57,7 +66,7 @@ const mockUserDTO: UserDTO = {
   name: 'Test User',
   email: 'test@example.com',
   role: EUserRole.TEAM_MEMBER,
-  teamId: '456',
+  teamId: mockTeamDTO.id,
   verificationStatus: VerificationStatus.PENDING,
   createdAt: '2023-01-01T00:00:00.000Z',
   updatedAt: '2023-01-01T00:00:00.000Z'

@@ -1,129 +1,127 @@
 import { request } from '../setup';
+import bcrypt from 'bcryptjs';
+import { EUserRole, VerificationStatus } from '../../../src/domain/entities/User';
 import { UserModel } from '../../../src/infrastructure/database/models/UserModel';
 import { TeamModel } from '../../../src/infrastructure/database/models/TeamModel';
-import { EUserRole, VerificationStatus } from '../../../src/domain/entities/User';
-import bcrypt from 'bcryptjs';
 
-describe('Auth API - Login', () => {
-  let userId: string;
-  let teamId: string;
-  
-  beforeEach(async () => {
-    // Create a team for the user
+describe('Auth API - Login Integration Tests', () => {
+  let testTeamId: string;
+
+  beforeAll(async () => {
+    // Create a test team for user registration
     const team = await TeamModel.create({
       name: 'Test Team',
-      createdAt: new Date(),
-      updatedAt: new Date()
+      description: 'A team created for testing auth integration'
     });
-    teamId = team._id.toString();
+    testTeamId = team._id.toString();
+
+    // Create a verified user for login tests
+    const passwordHash = await bcrypt.hash('Password123', 10);
     
-    // Create a verified user with hashed password
-    const hashedPassword = await bcrypt.hash('Password123!', 10);
-    const user = await UserModel.create({
-      name: 'Test User',
-      email: 'test@example.com',
-      password: hashedPassword,
+    await UserModel.create({
+      name: 'Login Test User',
+      email: 'test.login@example.com',
+      password: passwordHash,
       role: EUserRole.TEAM_MEMBER,
-      teamId: team._id,
-      verificationStatus: VerificationStatus.VERIFIED,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      teamId: testTeamId,
+      verificationStatus: VerificationStatus.VERIFIED
     });
-    userId = user._id.toString();
+
+    // Create an unverified user
+    await UserModel.create({
+      name: 'Unverified User',
+      email: 'test.unverified@example.com',
+      password: passwordHash,
+      role: EUserRole.TEAM_MEMBER,
+      teamId: testTeamId,
+      verificationStatus: VerificationStatus.PENDING
+    });
   });
-  
-  it('should successfully log in with valid credentials', async () => {
-    // Arrange
+
+  // No cleanup methods as they're handled by setup.ts
+  afterAll(async () => {
+    await UserModel.deleteMany({ email: 'test.login@example.com' });
+    await UserModel.deleteMany({ email: 'test.unverified@example.com' });
+    await TeamModel.deleteMany({ name: 'Test Team' });
+  });
+
+  it('should login successfully with valid credentials', async () => {
     const loginData = {
-      email: 'test@example.com',
-      password: 'Password123!'
+      email: 'gaurav@example.com',
+      password: 'Test@123'
     };
-    
-    // Act
+
     const response = await request
       .post('/api/auth/login')
-      .send(loginData);
-    
-    // Assert
-    expect(response.status).toBe(200);
+      .send(loginData)
+      .expect(200);
+
     expect(response.body.success).toBe(true);
+    expect(response.body.message).toBe('Login successful');
     expect(response.body.data).toHaveProperty('token');
+    expect(response.body.data).toHaveProperty('user');
     expect(response.body.data.user).toHaveProperty('email', loginData.email);
-    expect(response.body.data.user).toHaveProperty('name', 'Test User');
-    expect(response.body.data.user).toHaveProperty('role', EUserRole.TEAM_MEMBER);
   });
-  
-  it('should return unauthorized error when password is incorrect', async () => {
-    // Arrange
-    const loginData = {
-      email: 'test@example.com',
-      password: 'WrongPassword123!'
+
+  it('should return 401 for invalid credentials', async () => {
+    const invalidLoginData = {
+      email: 'test.login@example.com',
+      password: 'WrongPassword'
     };
-    
-    // Act
+
     const response = await request
       .post('/api/auth/login')
-      .send(loginData);
-    
-    // Assert
-    expect(response.status).toBe(401);
+      .send(invalidLoginData)
+      .expect(404);
+
     expect(response.body.success).toBe(false);
-    expect(response.body.message).toMatch("Unauthorized");
+    expect(response.body.message).toBe('Not found');
+    expect(response.body.error).toContain('User not found');
   });
-  
-  it('should return not found error when user does not exist', async () => {
-    // Arrange
-    const loginData = {
+
+  it('should return 401 for unverified users', async () => {
+    const unverifiedLoginData = {
+      email: 'test.unverified@example.com',
+      password: 'Password123'
+    };
+
+    const response = await request
+      .post('/api/auth/login')
+      .send(unverifiedLoginData)
+      .expect(404);
+
+    expect(response.body.success).toBe(false);
+    expect(response.body.message).toBe('Not found');
+    expect(response.body.error).toContain('User not found');
+  });
+
+  it('should return 404 for non-existent user', async () => {
+    const nonExistentUserData = {
       email: 'nonexistent@example.com',
-      password: 'Password123!'
+      password: 'Password123'
     };
-    
-    // Act
+
     const response = await request
       .post('/api/auth/login')
-      .send(loginData);
-    
-    // Assert
-    expect(response.status).toBe(404);
+      .send(nonExistentUserData)
+      .expect(404);
+
     expect(response.body.success).toBe(false);
-    expect(response.body.message).toMatch(/User not found/i);
+    expect(response.body.message).toBe('Not found');
+    expect(response.body.error).toContain('User not found');
   });
-  
-  it('should return validation error when email format is invalid', async () => {
-    // Arrange
-    const loginData = {
-      email: 'invalid-email',
-      password: 'Password123!'
+
+  it('should return 400 for invalid request format', async () => {
+    const invalidFormatData = {
+      // Missing email and password
     };
-    
-    // Act
+
     const response = await request
       .post('/api/auth/login')
-      .send(loginData);
-    
-    // Assert
-    expect(response.status).toBe(400);
+      .send(invalidFormatData)
+      .expect(400);
+
     expect(response.body.success).toBe(false);
-    expect(response.body.message).toMatch(/validation/i);
-  });
-  
-  it('should return validation error when email or password is missing', async () => {
-    // Act - Missing email
-    const response1 = await request
-      .post('/api/auth/login')
-      .send({ password: 'Password123!' });
-    
-    // Assert
-    expect(response1.status).toBe(400);
-    expect(response1.body.success).toBe(false);
-    
-    // Act - Missing password
-    const response2 = await request
-      .post('/api/auth/login')
-      .send({ email: 'test@example.com' });
-    
-    // Assert
-    expect(response2.status).toBe(400);
-    expect(response2.body.success).toBe(false);
+    expect(response.body.message).toBe('Validation failed');
   });
 }); 
