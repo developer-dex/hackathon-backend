@@ -72,7 +72,6 @@ export class CreateKudos {
           }
         }
 
-        if (process.env.NODE_ENV === "development") {
           this.basecampService.sendKudosMessage({
             sender: currentUser.name,
             receiver: receiver.getName(),
@@ -89,7 +88,6 @@ export class CreateKudos {
             category.getName(),
             kudos.getMessage()
           );
-        }
       } catch (error) {
         console.error("Error sending to Basecamp:", error);
       }
