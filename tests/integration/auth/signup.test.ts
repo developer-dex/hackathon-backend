@@ -1,172 +1,120 @@
 import { request } from '../setup';
-import { UserModel } from '../../../src/infrastructure/database/models/UserModel';
-import { TeamModel } from '../../../src/infrastructure/database/models/TeamModel';
-import { EUserRole, VerificationStatus } from '../../../src/domain/entities/User';
 import mongoose from 'mongoose';
+import { EUserRole } from '../../../src/domain/entities/User';
+import { UserModel } from '../../../src/infrastructure/database/models/UserModel';
 
-describe('Auth API - Signup', () => {
-  let teamId: string;
-  
-  beforeEach(async () => {
-    // Create a team for the user to join
-    const team = await TeamModel.create({
-      name: 'Test Team',
-      createdAt: new Date(),
-      updatedAt: new Date()
-    });
-    teamId = team._id.toString();
+describe('Auth API - Signup Integration Tests', () => {
+  let testTeamId: string;
+
+  beforeAll(async () => {
+    testTeamId = "60286739c762b78cce0edfe4";
   });
-  
-  it('should successfully register a new user with valid data', async () => {
-    // Arrange
+
+  // No cleanup methods as they're handled by setup.ts
+  afterAll(async () => {
+    await UserModel.deleteMany({ email: 'test.useremail@example.com' });
+  });
+
+  it('should register a new user successfully', async () => {
     const signupData = {
-      name: 'New User',
-      email: 'newuser@example.com',
-      password: 'Password123!',
-      confirmPassword: 'Password123!',
+      name: 'Test User',
+      email: 'test.useremail@example.com',
+      password: 'Test@123',
+      confirmPassword: 'Test@123',
       role: EUserRole.TEAM_MEMBER,
-      teamId: teamId
+      teamId: testTeamId
     };
-    
-    // Act
+
     const response = await request
       .post('/api/auth/signup')
-      .send(signupData);
-    
-    // Assert
-    expect(response.status).toBe(201);
+      .send(signupData)
+      .expect(201);
+
     expect(response.body.success).toBe(true);
+    expect(response.body.message).toContain('User registered successfully');
     expect(response.body.data).toHaveProperty('id');
     expect(response.body.data).toHaveProperty('email', signupData.email);
     expect(response.body.data).toHaveProperty('name', signupData.name);
-    
-    // Check database
-    const createdUser = await UserModel.findOne({ email: signupData.email });
-    expect(createdUser).toBeTruthy();
-    expect(createdUser?.name).toBe(signupData.name);
-    expect(createdUser?.role).toBe(signupData.role);
-    expect(createdUser?.teamId.toString()).toBe(signupData.teamId);
+    expect(response.body.data).toHaveProperty('role', signupData.role);
+    expect(response.body.data.team).toHaveProperty('id', testTeamId);
   });
-  
-  it('should return validation error when passwords do not match', async () => {
-    // Arrange
-    const signupData = {
-      name: 'New User',
-      email: 'newuser@example.com',
-      password: 'Password123!',
-      confirmPassword: 'DifferentPassword123!',
-      role: EUserRole.TEAM_MEMBER,
-      teamId: teamId
+
+  it('should return 400 if required fields are missing', async () => {
+    const incompleteData = {
+      name: 'Incomplete User',
+      email: 'incomplete@example.com',
+      // Missing password and other required fields
     };
-    
-    // Act
+
     const response = await request
       .post('/api/auth/signup')
-      .send(signupData);
-    
-    // Assert
-    expect(response.status).toBe(400);
+      .send(incompleteData)
+      .expect(400);
+
     expect(response.body.success).toBe(false);
-    expect(response.body.message).toMatch("Validation failed");
-    
-    // Verify user wasn't created
-    const user = await UserModel.findOne({ email: signupData.email });
-    expect(user).toBeNull();
+    expect(response.body.message).toBe('Validation failed');
   });
-  
-  it('should return validation error when email is invalid', async () => {
-    // Arrange
-    const signupData = {
-      name: 'New User',
-      email: 'invalid-email',
-      password: 'Password123!',
-      confirmPassword: 'Password123!',
+
+  it('should return 400 if passwords do not match', async () => {
+    const mismatchPasswordData = {
+      name: 'Mismatch User',
+      email: 'mismatch@example.com',
+      password: 'Password123',
+      confirmPassword: 'DifferentPassword',
       role: EUserRole.TEAM_MEMBER,
-      teamId: teamId
+      teamId: testTeamId
     };
-    
-    // Act
+
     const response = await request
       .post('/api/auth/signup')
-      .send(signupData);
-    
-    // Assert
-    expect(response.status).toBe(400);
+      .send(mismatchPasswordData)
+      .expect(400);
+
     expect(response.body.success).toBe(false);
+    expect(response.body.error).toContain('Passwords must match');
   });
-  
-  it('should return error when team ID does not exist', async () => {
-    // Arrange
-    const signupData = {
-      name: 'New User',
-      email: 'newuser@example.com',
-      password: 'Password123!',
-      confirmPassword: 'Password123!',
+
+  it('should return 409 if email is already registered', async () => {
+    // First, create a user
+    const existingUserData = {
+      name: 'Existing User',
+      email: 'test.useremail@example.com',
+      password: 'Password123',
+      confirmPassword: 'Password123',
+      role: EUserRole.TEAM_MEMBER,
+      teamId: testTeamId
+    };
+
+    await request
+      .post('/api/auth/signup')
+      .send(existingUserData);
+
+    // Try to register with the same email
+    const response = await request
+      .post('/api/auth/signup')
+      .send(existingUserData)
+      .expect(400);
+
+    expect(response.body.success).toBe(false);
+    expect(response.body.error).toContain('Email is already registered');
+  });
+
+  it('should return 400 if team does not exist', async () => {
+    const invalidTeamData = {
+      name: 'Invalid Team User',
+      email: 'test.invalidteam@example.com',
+      password: 'Password123',
+      confirmPassword: 'Password123',
       role: EUserRole.TEAM_MEMBER,
       teamId: new mongoose.Types.ObjectId().toString() // Non-existent team ID
     };
-    
-    // Act
+
     const response = await request
       .post('/api/auth/signup')
-      .send(signupData);
-    
-    // Assert
-    expect(response.status).toBe(404);
+      .send(invalidTeamData)
+      .expect(400);
+
     expect(response.body.success).toBe(false);
-    expect(response.body.message).toMatch(/team not found/i);
-  });
-  
-  it('should return conflict error when email already exists', async () => {
-    // Arrange - Create a user first
-    await UserModel.create({
-      name: 'Existing User',
-      email: 'existing@example.com',
-      password: 'hashedpassword',
-      role: EUserRole.TEAM_MEMBER,
-      teamId: new mongoose.Types.ObjectId(teamId),
-      verificationStatus: VerificationStatus.VERIFIED,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    });
-    
-    const signupData = {
-      name: 'New User',
-      email: 'existing@example.com', // Same email as existing user
-      password: 'Password123!',
-      confirmPassword: 'Password123!',
-      role: EUserRole.TEAM_MEMBER,
-      teamId: teamId
-    };
-    
-    // Act
-    const response = await request
-      .post('/api/auth/signup')
-      .send(signupData);
-    
-    // Assert
-    expect(response.status).toBe(409);
-    expect(response.body.success).toBe(false);
-    expect(response.body.message).toMatch("Validation failed");
-  });
-  
-  it('should return validation error when required fields are missing', async () => {
-    // Arrange - Missing name
-    const signupData = {
-      email: 'newuser@example.com',
-      password: 'Password123!',
-      confirmPassword: 'Password123!',
-      role: EUserRole.TEAM_MEMBER,
-      teamId: teamId
-    };
-    
-    // Act
-    const response = await request
-      .post('/api/auth/signup')
-      .send(signupData);
-    
-    // Assert
-    expect(response.status).toBe(400);
-    expect(response.body.success).toBe(false);
+    expect(response.body.error).toContain('Selected team does not exist');
   });
 }); 

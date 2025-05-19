@@ -1,16 +1,17 @@
 import mongoose from 'mongoose';
-import app from '../../src/app';
 import supertest from 'supertest';
 import dotenv from 'dotenv';
+// import app from '../../src/app';
 
 // Load environment variables
 dotenv.config();
 
-// Create supertest request object
-export const request = supertest(app);
+// Create supertest request object pointing to our app instance
+export const request = supertest('http://192.168.10.129:8000'); 
 
 // Get test database URL
 const TEST_DB_URL = process.env.MONGODB_URI_TEST || 'mongodb://localhost:27017/test_db';
+
 
 // Connect to test database
 export const setupDatabase = async (): Promise<void> => {
@@ -52,7 +53,7 @@ beforeAll(async () => {
 });
 
 afterEach(async () => {
-  await clearDatabase();
+  // await clearDatabase();
 });
 
 afterAll(async () => {

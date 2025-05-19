@@ -1,5 +1,5 @@
 import { GetAnalytics } from '../../../../../src/application/useCases/analytics/GetAnalytics';
-import { IAnalyticsRepository } from '../../../../../src/domain/interfaces/repositories/IAnalyticsRepository';
+import { IAnalyticsRepository } from '../../../../../src/domain/interfaces/repositories/AnalyticsRepository';
 import { AnalyticsRequestDto, AnalyticsResponseDto, TimePeriod } from '../../../../../src/dtos/AnalyticsDto';
 import { ResponseMapper } from '../../../../../src/mappers/ResponseMapper';
 
@@ -28,6 +28,10 @@ const mockAnalyticsResponse: AnalyticsResponseDto = {
   topTeams: [
     { id: 'team-123', name: 'Engineering Team', count: 25 },
     { id: 'team-456', name: 'Marketing Team', count: 15 }
+  ],
+  topTrendingCategories: [
+    { id: 'cat-123', name: 'Leadership', count: 15 },
+    { id: 'cat-456', name: 'Innovation', count: 12 }
   ],
   totalKudos: 50,
   avgKudosPerPerson: 2.5,

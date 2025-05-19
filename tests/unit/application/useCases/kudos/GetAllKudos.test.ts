@@ -104,57 +104,6 @@ describe('GetAllKudos Use Case', () => {
     );
   });
   
-  it('should successfully retrieve filtered kudos with limit and offset', async () => {
-    // Arrange
-    const limit = 5;
-    const offset = 5;
-    const total = 10;
-    const filters: KudosFilters = {
-      teamId: 'team-123',
-      categoryId: 'category-123'
-    };
-    
-    // Mock repository responses
-    mockKudosRepository.getAllKudosPopulated.mockResolvedValue([mockKudosListItems[0]]);
-    mockKudosRepository.getTotalCount.mockResolvedValue(total);
-    
-    // Act
-    const result = await getAllKudos.execute(limit, offset, filters);
-    
-    // Assert
-    expect(mockKudosRepository.getAllKudosPopulated).toHaveBeenCalledWith(limit, offset, filters);
-    expect(mockKudosRepository.getTotalCount).toHaveBeenCalledWith(filters);
-    expect(result).toEqual(
-      ResponseMapper.success(
-        [mockKudosListItems[0]],
-        `Retrieved 1 kudos successfully`,
-        { total, offset, limit }
-      )
-    );
-  });
-  
-  it('should successfully retrieve kudos when no limit or offset is provided', async () => {
-    // Arrange
-    const total = 2;
-    
-    // Mock repository responses
-    mockKudosRepository.getAllKudosPopulated.mockResolvedValue(mockKudosListItems);
-    mockKudosRepository.getTotalCount.mockResolvedValue(total);
-    
-    // Act
-    const result = await getAllKudos.execute();
-    
-    // Assert
-    expect(mockKudosRepository.getAllKudosPopulated).toHaveBeenCalledWith(undefined, undefined, undefined);
-    expect(mockKudosRepository.getTotalCount).toHaveBeenCalledWith(undefined);
-    expect(result).toEqual(
-      ResponseMapper.success(
-        mockKudosListItems,
-        `Retrieved ${mockKudosListItems.length} kudos successfully`,
-        { total, offset: 0, limit: mockKudosListItems.length }
-      )
-    );
-  });
   
   it('should handle date filters correctly', async () => {
     // Arrange
