@@ -54,7 +54,6 @@ const mockCategoryRepository: jest.Mocked<IKudosCategoryRepository> = {
   getAllCategories: jest.fn(),
   updateCategory: jest.fn(),
   deleteCategory: jest.fn(),
-  initializeDefaultCategories: jest.fn()
 };
 
 // Mock team lead user

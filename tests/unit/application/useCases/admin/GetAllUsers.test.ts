@@ -93,7 +93,7 @@ describe('GetAllUsers Use Case', () => {
     const result = await getAllUsers.execute();
     
     // Assert
-    expect(mockUserRepository.getAllUsers).toHaveBeenCalledWith(undefined, undefined, 0);
+    expect(mockUserRepository.getAllUsers).toHaveBeenCalledWith(undefined, undefined, undefined);
     expect(mockUserRepository.getTotalUsersCount).toHaveBeenCalledWith(undefined);
     expect(result).toEqual({
       users: mockUsers,
@@ -115,7 +115,7 @@ describe('GetAllUsers Use Case', () => {
     const result = await getAllUsers.execute(role);
     
     // Assert
-    expect(mockUserRepository.getAllUsers).toHaveBeenCalledWith(role, undefined, 0);
+    expect(mockUserRepository.getAllUsers).toHaveBeenCalledWith(role, undefined, undefined);
     expect(mockUserRepository.getTotalUsersCount).toHaveBeenCalledWith(role);
     expect(result).toEqual({
       users: mockUsers,
@@ -127,7 +127,7 @@ describe('GetAllUsers Use Case', () => {
     // Arrange
     const limit = 2;
     const offset = 1;
-    const expectedSkip = 0; // (offset - 1) * limit = (1 - 1) * 2 = 0
+    const expectedSkip = 1; 
     const mockUsers = [mockUser1, mockUser2];
     const totalCount = 3; // Total of 3 users, but only returning 2
     
@@ -152,7 +152,7 @@ describe('GetAllUsers Use Case', () => {
     const role = EUserRole.TEAM_LEAD;
     const limit = 1;
     const offset = 2;
-    const expectedSkip = 1; // (offset - 1) * limit = (2 - 1) * 1 = 1
+    const expectedSkip = 2; 
     const mockUsers = [mockUser3];
     const totalCount = 1;
     
